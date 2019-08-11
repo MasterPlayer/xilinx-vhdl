@@ -8,3 +8,8 @@ inputs have equal priority. When packets arrive simultaneously, firstly transmit
 **N_BYTES** - size of input and output AXI-Stream bus in bytes. 
 
 Component include Xilinx parametrized macros(XPM), which presented in current component as output fifo (fifo_out_sync_xpm);
+
+
+![alt text][logo]
+
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_arb_2_to_1/axis_arb_2_to_1.pdf "Logo Title Text 2"
