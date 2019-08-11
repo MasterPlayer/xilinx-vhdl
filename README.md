@@ -15,7 +15,7 @@ Created according xilinx UG949 and UG906 documents
 ## AXIS_infrastructure
 Includes components for AXI-Stream infrastructure. 
 
-1. **axis_arb_2_to_1**
+1. **axis_arb_2_to_1**.
 Parametrizable arbiter 2 to 1 for transmit packets from 2 inputs to 1 output. 
 Packet transmission for other input starting when current packet from current input ended. No priority for inputs.
 Component include one parametrized fifo (xilinx parametrized macros(XPM)) with minimal size for output fifo
@@ -23,7 +23,7 @@ Tested for xilinx UltraScale Architecture, Xilinx 7 Series Architecture.
 Generic parameters : 
 - N_BYTES : count of bytes in a word. Minimal value is 2. Lower values not tested.
 
-2. **axis_dump_gen**
+2. **axis_dump_gen**.
 Parametrizable data generator. Data vector consists of arrays of byte counters.
 Inputs :
 - ENABLE - enable/disable data generator.
