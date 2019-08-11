@@ -25,17 +25,17 @@ Includes components for AXI-Stream infrastructure.
 
 
 2. **axis_dump_gen**
-	Parametrizable data generator. Data vector consists of arrays of byte counters.
-	Inputs : 
-		- ENABLE - enable/disable data generator.
-		- PAUSE - Pause between packets, 32 bit.
-		- WORD_LIMIT - number of words in packet. 
-	Generic parameters : 
-		- N_BYTES : count of bytes in a word. Minimal value is 2. Lower values not tested
-		- ASYNC : Asyncronous FIFO used. 
-			1) true - M_AXIS_* bus in M_AXIS_CLK clock domain, ENABLE, PAUSE, WORD_LIMIT and internal logic in CLK clock domain
-			2) false - M_AXIS_* bus and internal logic in one clock domain.
-	Some information available in document.
+Parametrizable data generator. Data vector consists of arrays of byte counters.
+Inputs :
+- ENABLE - enable/disable data generator.
+- PAUSE - Pause between packets, 32 bit.
+- WORD_LIMIT - number of words in packet. 
+Generic parameters :
+- N_BYTES : count of bytes in a word. Minimal value is 2. Lower values not tested
+- ASYNC : Asyncronous FIFO used. 
+1) true - M_AXIS_* bus in M_AXIS_CLK clock domain, ENABLE, PAUSE, WORD_LIMIT and internal logic in CLK clock domain
+2) false - M_AXIS_* bus and internal logic in one clock domain.
+Some information available in document.
 	
 
 3. **axis_icmp_chksum_calc**
