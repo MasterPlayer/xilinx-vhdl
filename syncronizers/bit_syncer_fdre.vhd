@@ -22,6 +22,7 @@ entity bit_syncer_fdre is
     );
     attribute dont_touch    : string;
     attribute dont_touch of bit_syncer_fdre  : entity is "true";
+
 end bit_syncer_fdre;
 
 
@@ -43,6 +44,14 @@ architecture bit_syncer_fdre_arch of bit_syncer_fdre is
     attribute ASYNC_REG of meta_1_out   : signal is "TRUE";
     attribute ASYNC_REG of meta_2_out   : signal is "TRUE";
     attribute ASYNC_REG of meta_3_out   : signal is "TRUE";
+    --attribute ASYNC_REG of meta_4_out   : signal is "TRUE";
+
+
+
+    attribute MAX_FANOUT : integer;
+    attribute MAX_FANOUT of meta_4_out: signal is 10;
+                
+            
 
 begin
 

@@ -27,11 +27,15 @@ architecture rst_syncer_arch of rst_syncer is
     signal  fdpe_1_out                  :           std_logic := '1'            ;
     signal  fdpe_2_out                  :           std_logic := '1'            ;
 
-    
+
     attribute ASYNC_REG                 :           string                      ;
     attribute ASYNC_REG of fdpe_0_out   :           signal is "TRUE"            ;
     attribute ASYNC_REG of fdpe_1_out   :           signal is "TRUE"            ;
+    attribute ASYNC_REG of fdpe_2_out   :           signal is "TRUE"            ;
 
+    attribute MAX_FANOUT : integer;
+    attribute MAX_FANOUT of fdpe_2_out: signal is 10;
+             
 begin
 
 
