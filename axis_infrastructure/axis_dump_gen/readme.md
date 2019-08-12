@@ -20,11 +20,8 @@ Packet structure presented as array of 8 bit counters
 example presented in picture
 
 Component include Xilinx parametrized macros(XPM), which presented in current component as output fifo 
-1) (`fifo_out_sync_xpm`) - for syncronous mode (`ASYNC = false`);
-2) (`fifo_out_async_xpm`) - for asyncronous mode (`ASYNC = true`);
-
-[source code of fifo_out_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_sync_xpm/fifo_out_sync_xpm.vhd)
-[source code of fifo_out_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_async_xpm/fifo_out_async_xpm.vhd)
+1) [`fifo_out_sync_xpm`](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_sync_xpm/fifo_out_sync_xpm.vhd) - for syncronous mode (`ASYNC = false`);
+2) [`fifo_out_async_xpm`](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_async_xpm/fifo_out_async_xpm.vhd) - for asyncronous mode (`ASYNC = true`);
 
 ![arbiter scheme][logo]
 
