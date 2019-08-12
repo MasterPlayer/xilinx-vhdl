@@ -76,7 +76,7 @@ begin
             RD_DATA_COUNT_WIDTH     =>  FIFO_DATA_COUNT_W   ,
             READ_DATA_WIDTH         =>  1                   ,
             READ_MODE               =>  "fwft"              ,
-            SIM_ASSERT_CHK          =>  0                   ,
+            --SIM_ASSERT_CHK          =>  0                   ,
             USE_ADV_FEATURES        =>  "0000"              ,
             WAKEUP_TIME             =>  0                   ,
             WRITE_DATA_WIDTH        =>  1                   ,

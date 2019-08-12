@@ -85,7 +85,7 @@ begin
             RD_DATA_COUNT_WIDTH     =>  FIFO_DATA_COUNT_W   ,   -- DECIMAL
             READ_DATA_WIDTH         =>  FIFO_WIDTH          ,
             READ_MODE               =>  "fwft"              ,
-            SIM_ASSERT_CHK          =>  0                   ,
+            --SIM_ASSERT_CHK          =>  0                   ,
             USE_ADV_FEATURES        =>  "0008"              ,
             WAKEUP_TIME             =>  0                   ,
             WRITE_DATA_WIDTH        =>  FIFO_WIDTH          ,
