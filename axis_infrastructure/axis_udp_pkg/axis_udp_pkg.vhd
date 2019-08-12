@@ -2,7 +2,8 @@ library IEEE;
     use IEEE.STD_LOGIC_1164.ALL;
     USE IEEE.STD_LOGIC_UNSIGNED.ALL;
     USE IEEE.STD_LOGIC_ARITH.ALL;
-
+    use IEEE.math_real."ceil";
+    use IEEE.math_real."log2";
 
 library UNISIM;
     use UNISIM.VComponents.all;
@@ -45,7 +46,7 @@ end axis_udp_pkg;
 
 architecture axis_udp_pkg_arch of axis_udp_pkg is
 
-    constant VERSION : string := "v1.0";
+    constant VERSION : string := "v1.1";
 
     signal  m_axis_reset                        :           std_logic   := '1'                                      ;
 
@@ -56,7 +57,7 @@ architecture axis_udp_pkg_arch of axis_udp_pkg is
     ATTRIBUTE X_INTERFACE_PARAMETER of S_AXIS_RESET: SIGNAL is "POLARITY ACTIVE_HIGH";
     ATTRIBUTE X_INTERFACE_PARAMETER of M_AXIS_RESET: SIGNAL is "POLARITY ACTIVE_HIGH";
 
-    
+    constant SIZE_SHFT                  :   integer := integer(ceil(log2(real(N_BYTES))));
 
     component ipv4_chksum_calc_sync
         generic(
@@ -254,7 +255,7 @@ begin
     pkt_size_reg_processing : process(M_AXIS_CLK)
     begin
         if M_AXIS_CLK'event AND M_AXIS_CLK = '1' then 
-            pkt_size_reg(15 downto 5) <= (SIZE(10 downto 0 ) + 1);
+            pkt_size_reg(15 downto SIZE_SHFT) <= (SIZE((15-SIZE_SHFT) downto 0 ) + 1);
         end if; 
     end process;
 
