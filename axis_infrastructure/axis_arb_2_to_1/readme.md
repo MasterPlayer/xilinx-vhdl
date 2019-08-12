@@ -10,6 +10,6 @@ inputs have equal priority. When packets arrive simultaneously, firstly transmit
 Component include Xilinx parametrized macros(XPM), which presented in current component as output fifo (fifo_out_sync_xpm);
 
 
-![alt text][logo]
+![arbiter scheme][logo]
 
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_arb_2_to_1/axis_arb_2_to_1.pdf "Logo Title Text 2"
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_arb_2_to_1/axis_arb_2_to_1_v1.0.png "Logo Title Text 2"
