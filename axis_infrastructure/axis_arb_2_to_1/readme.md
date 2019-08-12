@@ -8,7 +8,7 @@ inputs have equal priority. When packets arrive simultaneously, firstly transmit
 `N_BYTES` - size of input and output AXI-Stream bus in bytes. 
 
 Component include Xilinx parametrized macros(XPM), which presented in current component as output fifo (`fifo_out_sync_xpm`);
-
+[source code of fifo_out_sync_xpm](../fifo_parametrized/fifo_out_sync_xpm)
 
 ![arbiter scheme][logo]
 
