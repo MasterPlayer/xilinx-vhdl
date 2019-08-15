@@ -46,7 +46,7 @@ end axis_udp_pkg;
 
 architecture axis_udp_pkg_arch of axis_udp_pkg is
 
-    constant VERSION : string := "v1.1";
+    constant VERSION : string := "v1.2";
 
     signal  m_axis_reset                        :           std_logic   := '1'                                      ;
 
@@ -542,6 +542,119 @@ begin
         end process;
     end generate;
 
+    GEN_X32 : if N_BYTES = 4 generate 
+        out_din_data_processing : process(M_AXIS_CLK)
+        begin
+            if M_AXIS_CLK'event AND M_AXIS_CLK = '1' then 
+                case current_state is
+                    when IDLE_ST =>
+                        out_din_data <= out_din_data;
+                                    
+                    when WRITE_HEADER_ST =>
+                        case head_cnt is
+                            when x"00" => 
+                                out_din_data (   7 downto   0 ) <= DST_MAC (   7 downto   0 );
+                                out_din_data (  15 downto   8 ) <= DST_MAC (  15 downto   8 );
+                                out_din_data (  23 downto  16 ) <= DST_MAC (  23 downto  16 );
+                                out_din_data (  31 downto  24 ) <= DST_MAC (  31 downto  24 );
+                            when x"01" =>
+                                out_din_data (   7 downto   0 ) <= DST_MAC (  39 downto  32 );
+                                out_din_data (  15 downto   8 ) <= DST_MAC (  47 downto  40 );
+                                out_din_data (  23 downto  16 ) <= SRC_MAC (   7 downto   0 );
+                                out_din_data (  31 downto  24 ) <= SRC_MAC (  15 downto   8 );
+
+                            when x"02" => 
+                                out_din_data (   7 downto   0 ) <= SRC_MAC           (  23 downto  16 );
+                                out_din_data (  15 downto   8 ) <= SRC_MAC           (  31 downto  24 );
+                                out_din_data (  23 downto  16 ) <= SRC_MAC           (  39 downto  32 );
+                                out_din_data (  31 downto  24 ) <= SRC_MAC           (  47 downto  40 );
+                            when x"03" => 
+                                out_din_data (   7 downto   0 ) <= C_ETH_TYPE        (  15 downto   8 );
+                                out_din_data (  15 downto   8 ) <= C_ETH_TYPE        (   7 downto   0 );
+                                out_din_data (  23 downto  16 ) <= C_IPV4_IP_VER_LEN (  15 downto   8 );
+                                out_din_data (  31 downto  24 ) <= C_IPV4_IP_VER_LEN (   7 downto   0 );
+
+                            when x"04" => 
+                                out_din_data (   7 downto   0 ) <= pkt_size_reg_ip   (  15 downto   8 );
+                                out_din_data (  15 downto   8 ) <= pkt_size_reg_ip   (   7 downto   0 );
+                                out_din_data (  23 downto  16 ) <= C_IPV4_ID         (  15 downto   8 );
+                                out_din_data (  31 downto  24 ) <= C_IPV4_ID         (   7 downto   0 );
+                            when x"05" => 
+                                out_din_data (   7 downto   0 ) <= C_IPV4_FLAGS      (  15 downto   8 );
+                                out_din_data (  15 downto   8 ) <= C_IPV4_FLAGS      (   7 downto   0 );
+                                out_din_data (  23 downto  16 ) <= C_IPV4_TTL                          ;
+                                out_din_data (  31 downto  24 ) <= C_IPV4_PROTO                        ;
+                            
+                            when x"06" => 
+                                out_din_data (   7 downto   0 ) <= ipv4_chksum       (   7 downto   0 );
+                                out_din_data (  15 downto   8 ) <= ipv4_chksum       (  15 downto   8 );
+                                out_din_data (  23 downto  16 ) <= SRC_IP            (   7 downto   0 );
+                                out_din_data (  31 downto  24 ) <= SRC_IP            (  15 downto   8 );
+                            when x"07" => 
+                                out_din_data (   7 downto   0 ) <= SRC_IP            (  23 downto  16 );
+                                out_din_data (  15 downto   8 ) <= SRC_IP            (  31 downto  24 );
+                                out_din_data (  23 downto  16 ) <= DST_IP            (   7 downto   0 );
+                                out_din_data (  31 downto  24 ) <= DST_IP            (  15 downto   8 );
+
+                            when x"08" => 
+                                out_din_data (   7 downto   0 ) <= DST_IP            (  23 downto  16 );                          
+                                out_din_data (  15 downto   8 ) <= DST_IP            (  31 downto  24 );                          
+                                out_din_data (  23 downto  16 ) <= SRC_PORT          (  15 downto   8 );
+                                out_din_data (  31 downto  24 ) <= SRC_PORT          (   7 downto   0 );
+                            when x"09" => 
+                                out_din_data (   7 downto   0 ) <= DST_PORT          (  15 downto   8 );
+                                out_din_data (  15 downto   8 ) <= DST_PORT          (   7 downto   0 );
+                                out_din_data (  23 downto  16 ) <= pkt_size_reg_udp  (  15 downto   8 );
+                                out_din_data (  31 downto  24 ) <= pkt_size_reg_udp  (   7 downto   0 );
+
+                            when x"0a" => 
+                                out_din_data (   7 downto   0 ) <= ( others => '0' )    ;
+                                out_din_data (  15 downto   8 ) <= ( others => '0' )    ;
+                                out_din_data (  23 downto  16 ) <= pkt_size_reg_dump (   7 downto   0 )     ;
+                                out_din_data (  31 downto  24 ) <= pkt_size_reg_dump (  15 downto   8 )     ;
+                            when x"0b" => 
+                                out_din_data (   7 downto   0 ) <= reg_pnum (   7 downto   0 ) ;
+                                out_din_data (  15 downto   8 ) <= reg_pnum (  15 downto   8 ) ;
+                                out_din_data (  23 downto  16 ) <= CNT_US (   7 downto   0 );
+                                out_din_data (  31 downto  24 ) <= CNT_US (  15 downto   8 );
+                            when x"0c" => 
+                                out_din_data (   7 downto   0 ) <= CNT_US (  23 downto  16 );
+                                out_din_data (  15 downto   8 ) <= CNT_US (  31 downto  24 );
+                                out_din_data (  23 downto  16 ) <= CNT_US (  39 downto  32 );
+                                out_din_data (  31 downto  24 ) <= CNT_US (  47 downto  40 );
+                            when x"0d" => 
+                                out_din_data (   7 downto   0 ) <= CNT_US (  55 downto  48 );
+                                out_din_data (  15 downto   8 ) <= CNT_US (  63 downto  56 );
+                                out_din_data (  31 downto (DATA_WIDTH - DELAYREG_WIDTH)) <= in_dout_data( DELAYREG_WIDTH-1 downto 0 );
+
+                            when others =>
+                                out_din_data <= out_din_data;
+                        end case;   
+
+                    when WRITE_DATA_ST =>
+                        if in_rden = '1' then 
+                            out_din_data <= in_dout_data( DELAYREG_WIDTH-1 downto 0 ) & d_in_dout_data;
+                        else
+                            out_din_data <= out_din_data;
+                        end if;
+
+                    when WRITE_LAST_ST =>
+                        if out_awfull = '0' then 
+                            out_din_data( HEAD_WIDTH-1 downto 0 ) <= d_in_dout_data;
+                            out_din_data( DATA_WIDTH-1 downto HEAD_WIDTH ) <= out_din_data( DATA_WIDTH-1 downto HEAD_WIDTH ) ;
+                        else
+                            out_din_data <= out_din_data;
+                        end if;
+
+                    when others => 
+                        out_din_data <= out_din_data;
+
+                end case;
+            end if;
+        end process;
+    end generate;
+
+
     GEN_X64 : if N_BYTES = 8 generate 
         out_din_data_processing : process(M_AXIS_CLK)
         begin
@@ -716,7 +829,7 @@ begin
         end process;
     end generate;
 
-    GEN_XOTHER : if not(((N_BYTES = 32) or (N_BYTES = 2) or (N_BYTES = 8))) generate
+    GEN_XOTHER : if not(((N_BYTES = 32) or (N_BYTES = 2) or (N_BYTES = 8) or (N_BYTES = 4))) generate
 
         out_din_data_processing : process(M_AXIS_CLK)
         begin
