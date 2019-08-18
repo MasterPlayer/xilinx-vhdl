@@ -45,10 +45,13 @@ _S_AXIS_TREADY isn’t presented. Overflow data overwrite current holded data_
 Next parameters calculated for parametrized registers/buses/components. 
 
 1) `WORDA_WIDTH = N_BYTES_IN*8`
+
 _This parameter needed for calculating input word width for memory (RAM)_
 2) `WORDB_WIDTH = N_BYTES_OUT*8`
+
 _This parameter needed for calculating output word width for memory (RAM)_
 3) `ADDRA_WIDTH = log2((SEGMENT_BYTE_SIZE*N_CHANNELS)/N_BYTES_IN)`
+
 _This parameter needed for calculating address bus for PORT A in memory_
 **Example 1**
 * SEGMENT_BYTE_SIZE = 2048
@@ -58,6 +61,7 @@ _This parameter needed for calculating address bus for PORT A in memory_
 * Number of words for all memory : 65536/4 = 16384;
 * **Address bus for all memory(ADDRA_WIDTH) : log2(16384) = 14**
 4) `ADDRB_WIDTH = log2((SEGMENT_BYTE_SIZE*N_CHANNELS)/N_BYTES_OUT)`
+
 _This parameter needed for calculating address bus for PORT B in memory_
 **Example 1:**
 * SEGMENT_BYTE_SIZE = 2048
@@ -67,6 +71,7 @@ _This parameter needed for calculating address bus for PORT B in memory_
 * Number of words for all memory : 65536/32 = 2048;
 * **Address bus for all memory(ADDRB_WIDTH) : log2(2048) = 11**
 5) `SEG_CNT_WIDTH = log2(SEGMENT_BYTE_SIZE/N_BYTES_IN)`
+
 _width for register, which intended for segment addressation_
 **Example 1:**
 * SEGMENT_BYTE_SIZE = 1024
@@ -75,6 +80,7 @@ _width for register, which intended for segment addressation_
 * **Segment address counter width = log2(256) = 8**
 
 6) `SEG_PART_LIMIT = SEG_CNT_WIDTH - log2(SEGMENT_MAX_PKTS)`
+
 _cnt limit for packet which holded in one segment_
 **Example 1:**
 * SEG_CNT_WIDTH = 8;
@@ -82,20 +88,29 @@ _cnt limit for packet which holded in one segment_
 * **SEG_PART_LIMIT = 8 - log2(2) = 7**
 
 7) `DIFF_CNT_PART = SEG_CNT_WIDTH - SEG_PART_LIMIT`
+
 _the number of bits in the segment counter, which is designed to signal the finished packet_
 8) `ALL_ONES = width calculated as SEG_PART_LIMIT`
+
 _register for hold all '1' for compare with segment address counter for signal the finished packets_
 9) `HI_ADDRA = ADDRA_WIDTH - SEG_PART_LIMIT`
+
 _width of register which intended for transmission to read part_
 10) `BYTES_PER_PKT = SEGMENT_BYTE_SIZE/SEGMENT_MAX_PKTS`
+
 _number of bytes in packet in segment. Needed for read interface(for counter CNTB)_
 11) `CNTB_LIMIT = BYTES_PER_PKT/N_BYTES_OUT`
+
 _Limit of counting for CNTB register, which intended for read one packet from memory_
 12) `CNTB_WIDTH = log2(CNTB_LIMIT)`
+
 _Width of CNTB register_
 13) `CNTB_LIMIT_VECTOR = width calculated as CNTB_WIDTH`
+
 _register for hold all '1' for compare with segment address counter for finished packets on read interface of memory_
 14) `CMD_FIFO_WIDTH = ADDRA_WIDTH - HI_ADDRA`
+
 _width for cmd fifo which intended for transmission from write to read part_
 15) `FIFO_DEPTH = SEGMENT_MAX_PKTS * N_CHANNELS`
+
 _Depth for CMD fifo. calculated based on the number of channels and packets in one segment_
