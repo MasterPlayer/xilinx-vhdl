@@ -3,7 +3,11 @@
 ## DESCRIPTION
 The component is designed to collect, store, transmit data from various channels. Data comes from different channels randomly. The component collects data from various channels, collects them by segments, and transmits only ready-made packets.
 
-![arbiter scheme][logo]
+Component parametrized for some parameters, such as input, output width, number of channels, size of RAM, Sync/Async mode, segment size. 
+Component supports assymetric mode, when Input and output widths doesnt match.
+
+
+![axis collector][logo]
 
 [logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/axis_collector.png "Logo Title Text 2"
 
@@ -132,3 +136,17 @@ _width for cmd fifo which intended for transmission from write to read part_
 15) `FIFO_DEPTH = SEGMENT_MAX_PKTS * N_CHANNELS`
 
 _Depth for CMD fifo. calculated based on the number of channels and packets in one segment_
+
+
+## REGISTERS : 
+1) `wea` - write enable for memory 
+2) `addra` - address bus for PORTA
+[addra structure]
+3) `dina` - data register 
+4) `addrb` - address bus for PORTB
+[addrb structure]
+5) `doutb` - data output from memory PORTB
+6) `addra_vector` - array of counters for addressation in each segment of memory
+[addra_vector structure]
+7) `event_compl_vector` - register for indicating event of finished packet in segment
+8) `cntb` - counter for segment for PORTB of RAM
