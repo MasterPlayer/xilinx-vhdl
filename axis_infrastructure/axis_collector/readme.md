@@ -141,12 +141,25 @@ _Depth for CMD fifo. calculated based on the number of channels and packets in o
 ## REGISTERS : 
 1) `wea` - write enable for memory 
 2) `addra` - address bus for PORTA
-[addra structure]
+
+![addra structure][logo]
+
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_reg.png "Logo Title Text 2"
+
 3) `dina` - data register 
 4) `addrb` - address bus for PORTB
-[addrb structure]
+
+![addrb structure][logo]
+
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addrb_reg.png "Logo Title Text 2"
+
 5) `doutb` - data output from memory PORTB
 6) `addra_vector` - array of counters for addressation in each segment of memory
-[addra_vector structure]
+
+![addra_vector structure][logo]
+
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_vector_organization.png "Logo Title Text 2"
+
+
 7) `event_compl_vector` - register for indicating event of finished packet in segment
 8) `cntb` - counter for segment for PORTB of RAM
