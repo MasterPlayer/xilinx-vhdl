@@ -6,7 +6,6 @@ The component is designed to collect, store, transmit data from various channels
 Component parametrized for some parameters, such as input, output width, number of channels, size of RAM, Sync/Async mode, segment size. 
 Component supports assymetric mode, when Input and output widths doesnt match.
 
-
 ![axis collector][logo]
 
 [logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/axis_collector.png "Logo Title Text 2"
@@ -160,6 +159,12 @@ _Depth for CMD fifo. calculated based on the number of channels and packets in o
 
 7) `event_compl_vector` - register for indicating event of finished packet in segment
 8) `cntb` - counter for segment for PORTB of RAM
+
+
+
+## CHANGE LOG 
+* v1.0 - first release
+
 
 
 [logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_reg.png "Logo Title Text 2"
