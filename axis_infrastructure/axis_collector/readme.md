@@ -143,22 +143,21 @@ _Depth for CMD fifo. calculated based on the number of channels and packets in o
 
 ![addra structure][logo1]
 
-
 3) `dina` - data register 
 4) `addrb` - address bus for PORTB
 
 ![addrb structure][logo2]
-
 
 5) `doutb` - data output from memory PORTB
 6) `addra_vector` - array of counters for addressation in each segment of memory
 
 ![addra_vector structure][logo3]
 
-
-
 7) `event_compl_vector` - register for indicating event of finished packet in segment
 8) `cntb` - counter for segment for PORTB of RAM
+
+FINITE STATE MACHINE: 
+![fsm structure][logo4]
 
 
 
@@ -172,3 +171,5 @@ _Depth for CMD fifo. calculated based on the number of channels and packets in o
 [logo2]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addrb_reg.png "Logo Title Text 2"
 
 [logo3]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_vector_organization.png "Logo Title Text 2"
+
+[logo4]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/fsm.png "Logo Title Text 2"
