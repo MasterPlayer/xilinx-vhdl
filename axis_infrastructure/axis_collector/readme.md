@@ -142,24 +142,28 @@ _Depth for CMD fifo. calculated based on the number of channels and packets in o
 1) `wea` - write enable for memory 
 2) `addra` - address bus for PORTA
 
-![addra structure][logo]
+![addra structure][logo1]
 
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_reg.png "Logo Title Text 2"
 
 3) `dina` - data register 
 4) `addrb` - address bus for PORTB
 
-![addrb structure][logo]
+![addrb structure][logo2]
 
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addrb_reg.png "Logo Title Text 2"
 
 5) `doutb` - data output from memory PORTB
 6) `addra_vector` - array of counters for addressation in each segment of memory
 
-![addra_vector structure][logo]
+![addra_vector structure][logo3]
 
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_vector_organization.png "Logo Title Text 2"
 
 
 7) `event_compl_vector` - register for indicating event of finished packet in segment
 8) `cntb` - counter for segment for PORTB of RAM
+
+
+[logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_reg.png "Logo Title Text 2"
+
+[logo2]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addrb_reg.png "Logo Title Text 2"
+
+[logo3]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_vector_organization.png "Logo Title Text 2"
