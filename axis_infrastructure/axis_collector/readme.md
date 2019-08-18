@@ -3,6 +3,11 @@
 ## DESCRIPTION
 The component is designed to collect, store, transmit data from various channels. Data comes from different channels randomly. The component collects data from various channels, collects them by segments, and transmits only ready-made packets.
 
+![arbiter scheme][logo]
+
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/axis_collector.png "Logo Title Text 2"
+
+
 ## GENERIC:
 1) `N_CHANNELS` - Number of channels which do segmentation of RAM 
 2) `N_CHANNELS_W` - Channel width ( must be >`log2(N_CHANNELS)`)
