@@ -63,6 +63,7 @@ _This parameter needed for calculating address bus for PORT A in memory_
 4) `ADDRB_WIDTH = log2((SEGMENT_BYTE_SIZE*N_CHANNELS)/N_BYTES_OUT)`
 
 _This parameter needed for calculating address bus for PORT B in memory_
+
 **Example 1:**
 * SEGMENT_BYTE_SIZE = 2048
 * N_CHANNELS = 32
@@ -73,6 +74,7 @@ _This parameter needed for calculating address bus for PORT B in memory_
 5) `SEG_CNT_WIDTH = log2(SEGMENT_BYTE_SIZE/N_BYTES_IN)`
 
 _width for register, which intended for segment addressation_
+
 **Example 1:**
 * SEGMENT_BYTE_SIZE = 1024
 * N_BYTES_IN = 4
@@ -82,6 +84,7 @@ _width for register, which intended for segment addressation_
 6) `SEG_PART_LIMIT = SEG_CNT_WIDTH - log2(SEGMENT_MAX_PKTS)`
 
 _cnt limit for packet which holded in one segment_
+
 **Example 1:**
 * SEG_CNT_WIDTH = 8;
 * SEGMENT_MAX_PKTS = 2
