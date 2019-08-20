@@ -53,17 +53,17 @@ because you must avoid situations, when packet_fifo overloaded, but data fifo is
 
 **All signals works in CLK clock domain**
 ### AXI-Stream Slave interface
-`S_AXIS_TDATA_*` - input data bus. Data width configured with `N_BYTES*8` parameter 
-`S_AXIS_TKEEP_*` - input bus which indicate valid bytes in word. Width configured with `N_BYTES` parameter
-`S_AXIS_TVALID_*` - input port for indicate valid data on bus
-`S_AXIS_TREADY_*` - output port for signaling ability to receive data 
-`S_AXIS_TLAST_*` - input signal for indicates the boundary of packet
+* `S_AXIS_TDATA_*` - input data bus. Data width configured with `N_BYTES*8` parameter 
+* `S_AXIS_TKEEP_*` - input bus which indicate valid bytes in word. Width configured with `N_BYTES` parameter
+* `S_AXIS_TVALID_*` - input port for indicate valid data on bus
+* `S_AXIS_TREADY_*` - output port for signaling ability to receive data 
+* `S_AXIS_TLAST_*` - input signal for indicates the boundary of packet
 ### AXI-Stream Master interface
-`M_AXIS_TDATA_*` - output data bus. Data width configured with `N_BYTES*8` parameter 
-`M_AXIS_TKEEP_*` - output bus which indicate valid bytes in word. Width configured with `N_BYTES` parameter
-`M_AXIS_TVALID_*` - output port for indicate valid data on bus
-`M_AXIS_TREADY_*` - input port for signaling ability slave (external device) for receive data 
-`M_AXIS_TLAST_*` - output signal for indicates the boundary of packet
+* `M_AXIS_TDATA_*` - output data bus. Data width configured with `N_BYTES*8` parameter 
+* `M_AXIS_TKEEP_*` - output bus which indicate valid bytes in word. Width configured with `N_BYTES` parameter
+* `M_AXIS_TVALID_*` - output port for indicate valid data on bus
+* `M_AXIS_TREADY_*` - input port for signaling ability slave (external device) for receive data 
+* `M_AXIS_TLAST_*` - output signal for indicates the boundary of packet
 
 
 ## FSM
@@ -94,5 +94,5 @@ Next figure show Finite state machine transition diagram
 
 
 
-[logo0]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/axis_dump_gen.png
-[logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/axis_dump_gen.png
+[logo0]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_4_to_1/axis_pkt_sw_4_to_1_struct.png
+[logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_4_to_1/axis_pkt_sw_4_to_1_fsm.png
