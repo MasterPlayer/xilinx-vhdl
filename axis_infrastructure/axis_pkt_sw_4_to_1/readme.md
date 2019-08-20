@@ -80,7 +80,7 @@ This component contains Finite State machine. Following desctiption of states
 
 Next figure show Finite state machine transition diagram
 
-![fsm][logo0]
+![fsm][logo1]
 
 ## Change log
 1. *v1.0* - first release
