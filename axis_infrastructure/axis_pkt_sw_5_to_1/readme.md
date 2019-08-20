@@ -87,6 +87,12 @@ Next figure show Finite state machine transition diagram
 
 ![fsm][logo1]
 
+Next figure shows finite state machine in work as example
+
+![fsm_work][logo1]
+
+
+
 ## Change log
 1. *v1.0* - first release
 
@@ -99,3 +105,4 @@ Next figure show Finite state machine transition diagram
 
 [logo0]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_5_to_1/axis_pkt_sw_5_to_1_struct.png
 [logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_5_to_1/axis_pkt_sw_5_to_1_fsm.png
+[logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_5_to_1/axis_pkt_sw_5_to_1_fsm_work.png
