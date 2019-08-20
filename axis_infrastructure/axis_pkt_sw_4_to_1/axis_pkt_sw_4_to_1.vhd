@@ -10,11 +10,16 @@ library unisim;
 entity axis_pkt_sw_4_to_1 is
     generic(
         N_BYTES             :           integer := 8                                            ;
-        DATA_DEPTH          :           integer := 1024                                         ;
         FIFO_TYPE_DATA      :           string  := "block"                                      ;
-        PKT_DEPTH           :           integer := 16                                           ;
-        FIFO_TYPE_PKT       :           string  := "distributed"                                 
-
+        FIFO_TYPE_PKT       :           string  := "distributed"                                ;
+        DATA_DEPTH_0        :           integer := 1024                                         ;
+        DATA_DEPTH_1        :           integer := 1024                                         ;
+        DATA_DEPTH_2        :           integer := 1024                                         ;
+        DATA_DEPTH_3        :           integer := 1024                                         ;
+        PKT_DEPTH_0         :           integer := 16                                           ;
+        PKT_DEPTH_1         :           integer := 16                                           ;
+        PKT_DEPTH_2         :           integer := 16                                           ;
+        PKT_DEPTH_3         :           integer := 16                                            
     );
     port(
         CLK                 :   in      std_logic                                               ;
@@ -543,7 +548,7 @@ begin
         generic map (
             DATA_WIDTH      =>  DATA_WIDTH                  ,
             MEMTYPE         =>  FIFO_TYPE_DATA              ,
-            DEPTH           =>  DATA_DEPTH                        
+            DEPTH           =>  DATA_DEPTH_0                        
         )
         port map (
             CLK             =>  CLK                         ,
@@ -565,7 +570,7 @@ begin
     fifo_in_pkt_xpm_inst_0 : fifo_in_pkt_xpm
         generic map (
             MEMTYPE         =>  FIFO_TYPE_PKT           ,
-            DEPTH           =>  PKT_DEPTH                       
+            DEPTH           =>  PKT_DEPTH_0                       
         )
         port map (
             CLK             =>  CLK                     ,
@@ -580,7 +585,7 @@ begin
         generic map (
             DATA_WIDTH      =>  DATA_WIDTH                  ,
             MEMTYPE         =>  FIFO_TYPE_DATA              ,
-            DEPTH           =>  DATA_DEPTH                        
+            DEPTH           =>  DATA_DEPTH_1                        
         )
         port map (
             CLK             =>  CLK                         ,
@@ -602,7 +607,7 @@ begin
     fifo_in_pkt_xpm_inst_1 : fifo_in_pkt_xpm
         generic map (
             MEMTYPE         =>  FIFO_TYPE_PKT           ,
-            DEPTH           =>  PKT_DEPTH                       
+            DEPTH           =>  PKT_DEPTH_1                       
         )
         port map (
             CLK             =>  CLK                     ,
@@ -617,7 +622,7 @@ begin
         generic map (
             DATA_WIDTH      =>  DATA_WIDTH                  ,
             MEMTYPE         =>  FIFO_TYPE_DATA              ,
-            DEPTH           =>  DATA_DEPTH                        
+            DEPTH           =>  DATA_DEPTH_2                        
         )
         port map (
             CLK             =>  CLK                         ,
@@ -639,7 +644,7 @@ begin
     fifo_in_pkt_xpm_inst_2 : fifo_in_pkt_xpm
         generic map (
             MEMTYPE         =>  FIFO_TYPE_PKT           ,
-            DEPTH           =>  PKT_DEPTH                       
+            DEPTH           =>  PKT_DEPTH_2                      
         )
         port map (
             CLK             =>  CLK                     ,
@@ -654,7 +659,7 @@ begin
         generic map (
             DATA_WIDTH      =>  DATA_WIDTH                  ,
             MEMTYPE         =>  FIFO_TYPE_DATA              ,
-            DEPTH           =>  DATA_DEPTH                        
+            DEPTH           =>  DATA_DEPTH_3                        
         )
         port map (
             CLK             =>  CLK                         ,
@@ -676,7 +681,7 @@ begin
     fifo_in_pkt_xpm_inst_3 : fifo_in_pkt_xpm
         generic map (
             MEMTYPE         =>  FIFO_TYPE_PKT           ,
-            DEPTH           =>  PKT_DEPTH                       
+            DEPTH           =>  PKT_DEPTH_3                       
         )
         port map (
             CLK             =>  CLK                     ,
