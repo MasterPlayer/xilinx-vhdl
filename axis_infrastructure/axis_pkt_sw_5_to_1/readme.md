@@ -2,7 +2,7 @@
 
 ![component scheme][logo0]
 
-##Description
+## Description
 
 Packet switch component for transmission from 5 inputs to 1 output
 All inputs have equal priority level
@@ -21,7 +21,7 @@ This block supports AXI-Stream interface. If internal data memory is full, S_AXI
 
 Fifo depths configured individually for each input. Memory Types configured for all fifo.
 
-##Generic parameters
+## Generic parameters
 1. `N_BYTES` - Number of bytes of data bus (`*_AXIS_TDATA_*). 
 2. `FIFO_TYPE_DATA` - Type of data fifo, which intended for holding data words. Now available next types:
 * "block" - use BRAM memory for data fifo
@@ -97,5 +97,5 @@ Next figure show Finite state machine transition diagram
 3. fifo_out_sync_xpm - fifo for output
 
 
-[logo0]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_4_to_1/axis_pkt_sw_5_to_1_struct.png
-[logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_4_to_1/axis_pkt_sw_5_to_1_fsm.png
+[logo0]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_5_to_1/axis_pkt_sw_5_to_1_struct.png
+[logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_5_to_1/axis_pkt_sw_5_to_1_fsm.png
