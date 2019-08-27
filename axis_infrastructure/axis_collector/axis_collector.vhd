@@ -13,11 +13,13 @@ entity axis_collector is
     generic(
         N_CHANNELS              :           integer                          := 32              ; -- Number of channels which do segmentation of RAM 
         N_CHANNELS_W            :           integer                          := 5               ; -- Channel width ( must be > log2(N_CHANNELS))
+        TUSER_WIDTH             :           integer                          := 6               ;
         SEGMENT_BYTE_SIZE       :           integer                          := 2048            ; -- Size of each segment for holding data from each received channel
         N_BYTES_IN              :           integer                          := 4               ; -- Input width in bytes
         N_BYTES_OUT             :           integer                          := 32              ; -- output width in bytes, can be assymetric
         ASYNC_MODE              :           boolean                          := true            ; -- use asyncronous mode
-        SEGMENT_MAX_PKTS        :           integer                          := 2                 -- Number of packets in each segment. 
+        SEGMENT_MAX_PKTS        :           integer                          := 2               ; -- Number of packets in each segment. 
+        ADDR_USE                :           string                           := "full"            -- Address part using "full" or "high" 
 
     );
     port(
@@ -26,7 +28,7 @@ entity axis_collector is
         S_AXIS_TDATA            :   in      std_logic_vector ( (N_BYTES_IN*8)-1 downto 0 )      ;
         S_AXIS_TVALID           :   in      std_logic                                           ;
         S_AXIS_TID              :   in      std_logic_Vector ( N_CHANNELS_W-1 downto 0 )        ;
-
+        S_AXIS_TUSER            :   in      std_logic_vector ( TUSER_WIDTH-1 downto 0 )         ;
         M_AXIS_CLK              :   in      std_logic                                           ;
         M_AXIS_RESET            :   in      std_logic                                           ;
         M_AXIS_TDATA            :   out     std_logic_vector ( (N_BYTES_OUT*8)-1 downto 0 )     ;
@@ -40,7 +42,16 @@ end axis_collector;
 
 architecture axis_collector_arch of axis_collector is
 
-    constant VERSION            :           string  := "1.0";
+    ATTRIBUTE X_INTERFACE_INFO : STRING;
+    ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
+    ATTRIBUTE X_INTERFACE_INFO of S_AXIS_RESET: SIGNAL is "xilinx.com:signal:reset:1.0 S_AXIS_RESET RST";
+    ATTRIBUTE X_INTERFACE_PARAMETER of S_AXIS_RESET: SIGNAL is "POLARITY ACTIVE_HIGH";
+
+    ATTRIBUTE X_INTERFACE_INFO of M_AXIS_RESET: SIGNAL is "xilinx.com:signal:reset:1.0 M_AXIS_RESET RST";
+    ATTRIBUTE X_INTERFACE_PARAMETER of M_AXIS_RESET: SIGNAL is "POLARITY ACTIVE_HIGH";
+
+
+    constant VERSION            :           string  := "1.1";
 
     constant WORDA_WIDTH        :           integer :=  N_BYTES_IN*8;
     constant WORDB_WIDTH        :           integer :=  N_BYTES_OUT*8;
@@ -51,6 +62,7 @@ architecture axis_collector_arch of axis_collector is
     constant SEG_PART_LIMIT     :           integer := SEG_CNT_WIDTH - integer(ceil(log2(real(SEGMENT_MAX_PKTS))))     ;
     constant DIFF_CNT_PART      :           integer := SEG_CNT_WIDTH - SEG_PART_LIMIT;
     constant ALL_ONES           :           std_logic_Vector ( SEG_PART_LIMIT-1 downto 0 ) := (others => '1');
+    constant CNTA_PART          :           integer := ADDRA_WIDTH - (S_AXIS_TID'length + S_AXIS_TUSER'length);
 
     constant HI_ADDRA           :           integer := ADDRA_WIDTH - SEG_PART_LIMIT; -- transmitted to fifo high part of address, which must be readed in read part logic
 
@@ -62,6 +74,7 @@ architecture axis_collector_arch of axis_collector is
     constant CMD_FIFO_WIDTH     :           integer := ADDRA_WIDTH-HI_ADDRA;
 
     constant FIFO_DEPTH         :           integer := (SEGMENT_MAX_PKTS * N_CHANNELS);
+
 
     component sdpram_xpm
         generic(
@@ -197,7 +210,7 @@ architecture axis_collector_arch of axis_collector is
 
     signal  out_din_id_vector           :           std_logic_Vector ( (N_CHANNELS_W*3)-1 downto 0 ) := (others => '0') ;
     signal  valid_data_vector         :             std_logic_Vector ( 3 downto 0 ) := (others => '0');
-
+    --signal  last_vector : std_logic_Vector ( 3 downto 0 ) := (others => '0')    ;
 
 
 
@@ -248,16 +261,38 @@ begin
         end if;
     end process;
 
-    addra_processing : process(S_AXIS_CLK)
-    begin
-        if S_AXIS_CLK'event AND S_AXIS_CLK = '1' then 
-            if S_AXIS_TVALID = '1' then 
-                addra <= S_AXIS_TID & addra_vector( ((((conv_integer (S_AXIS_TID))+1)*SEG_CNT_WIDTH)-1) downto ((conv_integer(S_AXIS_TID))*SEG_CNT_WIDTH) );
-            else
-                addra <= addra;
+    GEN_HIGH_ADDR_USE : if ADDR_USE = "high" generate
+
+        addra_processing : process(S_AXIS_CLK)
+        begin
+            if S_AXIS_CLK'event AND S_AXIS_CLK = '1' then 
+                if S_AXIS_TVALID = '1' then 
+                    addra <= S_AXIS_TID & addra_vector( ((((conv_integer (S_AXIS_TID))+1)*SEG_CNT_WIDTH)-1) downto ((conv_integer(S_AXIS_TID))*SEG_CNT_WIDTH) );
+                else
+                    addra <= addra;
+                end if;
             end if;
-        end if;
-    end process;
+        end process;
+
+    end generate;
+
+
+    GEN_FULL_ADDR_USE : if ADDR_USE = "full" generate
+
+        addra_processing : process(S_AXIS_CLK)
+        begin
+            if S_AXIS_CLK'event AND S_AXIS_CLK = '1' then 
+                if S_AXIS_TVALID = '1' then 
+                    addra <= S_AXIS_TID & addra_vector(  ((((conv_integer (S_AXIS_TID))+1)*SEG_CNT_WIDTH)-1) downto (((((conv_integer (S_AXIS_TID))+1)*SEG_CNT_WIDTH)-1)-(CNTA_PART-1) ) ) & S_AXIS_TUSER;
+                else
+                    addra <= addra;
+                end if;
+            end if;
+        end process;
+
+    end generate;
+
+
 
     dina_processing : process(S_AXIS_CLK)
     begin
@@ -470,10 +505,10 @@ begin
             M_AXIS_TREADY       =>  M_AXIS_TREADY                                            
         );
 
-    out_din_keep    <= (others =>'1')      ;
-    out_din_last    <= '0'                 ;
-    out_din_id      <= out_din_id_vector( ((N_CHANNELS_W*2)-1) downto N_CHANNELS_W ); -- второе слово. всегда. 
-    out_din_data    <= doutb;
+    out_din_keep                <= (others =>'1')       ;
+    out_din_last                <= '0'                  ;
+    out_din_id                  <= out_din_id_vector( ((N_CHANNELS_W*2)-1) downto N_CHANNELS_W ); -- второе слово. всегда. 
+    out_din_data                <= doutb;
     
 
     out_din_id_vector_processing : process(M_AXIS_CLK)

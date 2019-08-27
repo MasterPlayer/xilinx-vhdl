@@ -4,7 +4,7 @@
 The component is designed to collect, store, transmit data from various channels. Data comes from different channels randomly. The component collects data from various channels, collects them by segments, and transmits only ready-made packets.
 
 Component parametrized for some parameters, such as input, output width, number of channels, size of RAM, Sync/Async mode, segment size. 
-Component supports assymetric mode, when Input and output widths doesnt match.
+Component supports assymetric mode, when input width and output width doesnt match.
 
 ![axis collector][logo]
 
@@ -19,6 +19,10 @@ Component supports assymetric mode, when Input and output widths doesnt match.
 5) `N_BYTES_OUT` - output width in bytes, can be assymetric
 6) `ASYNC_MODE` - use asyncronous mode
 7) `SEGMENT_MAX_PKTS` - Number of packets in each segment. 
+8) `ADDR_USE` - parameter for determine how address was formed. Valid values : 
+- `full` - use `S_AXIS_TID, S_AXIS_TUSER` signals for form address;
+- `high` - use `S_AXIS_TID` signal for address(for least signuficant bit)
+9) `TUSER_WIDTH` - width of S_AXIS_TUSER signal in bits
 
 ## PORTS:
 ### Inputs :
@@ -34,18 +38,19 @@ Component supports assymetric mode, when Input and output widths doesnt match.
 
 _S_AXIS_TREADY isn’t presented. Overflow data overwrite current holded data_
 
+4) `S_AXIS_TUSER` - input signal which using for low part of address in RAM memory port A. This signal using only when `ADDR_USE = 'full'`. This signal used for addressation inside segment
 
 ### Outputs :
 1) `M_AXIS_TDATA` - output data bus. Width parametrized in equation : 
 
 `N_BYTES_OUT * 8`
 
-2) `M_AXIS_TID` - output bus with identification segment. Width parametrized
+2) `M_AXIS_TID` - output bus with identification segment. Width parametrized with
 
 `N_CHANNELS_W`
 
 3) `M_AXIS_TVALID` - output signal for valid data on bus
-4) `M_AXIS_TREADY` - input signal for signaling ready of destination
+4) `M_AXIS_TREADY` - input signal for signaling ready of destination component
 
 
 ## CONSTANTS: 
@@ -136,6 +141,10 @@ _width for cmd fifo which intended for transmission from write to read part_
 
 _Depth for CMD fifo. calculated based on the number of channels and packets in one segment_
 
+16) `CNTA_PART = ADDRA_WIDTH - (S_AXIS_TID'length + S_AXIS_TUSER'length)`
+
+_Number of bits, which used for ADDRA register forming for addressation on RAM memory, portA. A Value of this bits used for determine which high part of bits in array of segment counters is used to form ADDRA_
+
 
 ## REGISTERS : 
 1) `wea` - write enable for memory 
@@ -149,7 +158,7 @@ _Depth for CMD fifo. calculated based on the number of channels and packets in o
 ![addrb structure][logo2]
 
 5) `doutb` - data output from memory PORTB
-6) `addra_vector` - array of counters for addressation in each segment of memory
+6) `addra_vector` - array of counters for addressation in each segment of memory(when used `ADDR_USE = "high"`). For `ADDR_USE = "full"` this register count for input words, and used for determine where to write current packet.
 
 ![addra_vector structure][logo3]
 
@@ -163,8 +172,7 @@ FINITE STATE MACHINE:
 
 ## CHANGE LOG 
 * v1.0 - first release
-
-
+* v1.1 - add `S_AXIS_TUSER` signal for address. This signal impact only when `ADDR_USE = full` attribute established
 
 [logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_reg.png "Logo Title Text 2"
 

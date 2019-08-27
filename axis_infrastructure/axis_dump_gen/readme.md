@@ -1,8 +1,8 @@
 # axis_dump_gen
 
-parametrized data generator 
+simplest parametrized data generator 
 
-(`N_BYTES` and `ASYNC` as variable parameters)
+(`N_BYTES` and `ASYNC` as configurable parameters)
 
 where
 
