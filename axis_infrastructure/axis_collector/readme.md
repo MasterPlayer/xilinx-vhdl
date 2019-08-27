@@ -21,7 +21,7 @@ Component supports assymetric mode, when input width and output width doesnt mat
 7) `SEGMENT_MAX_PKTS` - Number of packets in each segment. 
 8) `ADDR_USE` - parameter for determine how address was formed. Valid values : 
 - `full` - use `S_AXIS_TID, S_AXIS_TUSER` signals for form address;
-- `high` - use `S_AXIS_TID` signal for address(for least signuficant bit)
+- `high` - use `S_AXIS_TID` signal for address(for high signuficant bit). `S_AXIS_TUSER` was ignored and has no effect
 9) `TUSER_WIDTH` - width of S_AXIS_TUSER signal in bits
 
 ## PORTS:
