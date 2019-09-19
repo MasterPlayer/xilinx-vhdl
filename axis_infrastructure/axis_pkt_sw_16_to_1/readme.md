@@ -76,12 +76,14 @@ because you must avoid situations, when packet_fifo overloaded, but data fifo is
 ## Port desctiption
 
 **All signals works in CLK clock domain**
+
 ### AXI-Stream Slave interface
 * `S_AXIS_TDATA_*` - input data bus. Data width configured with `N_BYTES*8` parameter 
 * `S_AXIS_TKEEP_*` - input bus which indicate valid bytes in word. Width configured with `N_BYTES` parameter
 * `S_AXIS_TVALID_*` - input port for indicate valid data on bus
 * `S_AXIS_TREADY_*` - output port for signaling ability to receive data 
 * `S_AXIS_TLAST_*` - input signal for indicates the boundary of packet
+
 ### AXI-Stream Master interface
 * `M_AXIS_TDATA_*` - output data bus. Data width configured with `N_BYTES*8` parameter 
 * `M_AXIS_TKEEP_*` - output bus which indicate valid bytes in word. Width configured with `N_BYTES` parameter
@@ -97,41 +99,41 @@ This component contains Finite State machine. Following desctiption of states
 2. `CHK_1_ST` - Analyze packet fifo for channel 1. If packet fifo isn't empty, next state will be `TX_1_ST`. Otherwise, next state will be `CHK_2_ST`.
 3. `CHK_2_ST` - Analyze packet fifo for channel 2. If packet fifo isn't empty, next state will be `TX_2_ST`. Otherwise, next state will be `CHK_3_ST`.
 4. `CHK_3_ST` - Analyze packet fifo for channel 3. If packet fifo isn't empty, next state will be `TX_3_ST`. Otherwise, next state will be `CHK_4_ST`.
-1. `CHK_4_ST` - Analyze packet fifo for channel 4. If packet fifo isn't empty, next state will be `TX_4_ST`. Otherwise, next state will be `CHK_5_ST`.
-2. `CHK_5_ST` - Analyze packet fifo for channel 5. If packet fifo isn't empty, next state will be `TX_5_ST`. Otherwise, next state will be `CHK_6_ST`.
-3. `CHK_6_ST` - Analyze packet fifo for channel 6. If packet fifo isn't empty, next state will be `TX_6_ST`. Otherwise, next state will be `CHK_7_ST`.
-4. `CHK_7_ST` - Analyze packet fifo for channel 7. If packet fifo isn't empty, next state will be `TX_7_ST`. Otherwise, next state will be `CHK_8_ST`.
-1. `CHK_8_ST` - Analyze packet fifo for channel 8. If packet fifo isn't empty, next state will be `TX_8_ST`. Otherwise, next state will be `CHK_9_ST`.
-2. `CHK_9_ST` - Analyze packet fifo for channel 9. If packet fifo isn't empty, next state will be `TX_9_ST`. Otherwise, next state will be `CHK_A_ST`.
-3. `CHK_A_ST` - Analyze packet fifo for channel A. If packet fifo isn't empty, next state will be `TX_A_ST`. Otherwise, next state will be `CHK_B_ST`.
-4. `CHK_B_ST` - Analyze packet fifo for channel B. If packet fifo isn't empty, next state will be `TX_B_ST`. Otherwise, next state will be `CHK_C_ST`.
-1. `CHK_C_ST` - Analyze packet fifo for channel C. If packet fifo isn't empty, next state will be `TX_C_ST`. Otherwise, next state will be `CHK_D_ST`.
-2. `CHK_D_ST` - Analyze packet fifo for channel D. If packet fifo isn't empty, next state will be `TX_D_ST`. Otherwise, next state will be `CHK_E_ST`.
-3. `CHK_E_ST` - Analyze packet fifo for channel E. If packet fifo isn't empty, next state will be `TX_E_ST`. Otherwise, next state will be `CHK_F_ST`.
-4. `CHK_F_ST` - Analyze packet fifo for channel F. If packet fifo isn't empty, next state will be `TX_F_ST`. Otherwise, next state will be `CHK_0_ST`.
-5. `TX_0_ST` - Transmit data from fifo channel 0. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_1_ST`
-6. `TX_1_ST` - Transmit data from fifo channel 1. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_2_ST`
-7. `TX_2_ST` - Transmit data from fifo channel 2. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_3_ST`
-8. `TX_3_ST` - Transmit data from fifo channel 3. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_4_ST`
-8. `TX_4_ST` - Transmit data from fifo channel 4. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_5_ST`
-8. `TX_5_ST` - Transmit data from fifo channel 5. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_6_ST`
-8. `TX_6_ST` - Transmit data from fifo channel 6. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_7_ST`
-8. `TX_7_ST` - Transmit data from fifo channel 7. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_8_ST`
-8. `TX_8_ST` - Transmit data from fifo channel 8. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_9_ST`
-8. `TX_9_ST` - Transmit data from fifo channel 9. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_A_ST`
-8. `TX_A_ST` - Transmit data from fifo channel A. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_B_ST`
-8. `TX_B_ST` - Transmit data from fifo channel B. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_C_ST`
-8. `TX_C_ST` - Transmit data from fifo channel C. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_D_ST`
-8. `TX_D_ST` - Transmit data from fifo channel D. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_E_ST`
-8. `TX_E_ST` - Transmit data from fifo channel E. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_F_ST`
-8. `TX_F_ST` - Transmit data from fifo channel F. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_0_ST`
+5. `CHK_4_ST` - Analyze packet fifo for channel 4. If packet fifo isn't empty, next state will be `TX_4_ST`. Otherwise, next state will be `CHK_5_ST`.
+6. `CHK_5_ST` - Analyze packet fifo for channel 5. If packet fifo isn't empty, next state will be `TX_5_ST`. Otherwise, next state will be `CHK_6_ST`.
+7. `CHK_6_ST` - Analyze packet fifo for channel 6. If packet fifo isn't empty, next state will be `TX_6_ST`. Otherwise, next state will be `CHK_7_ST`.
+8. `CHK_7_ST` - Analyze packet fifo for channel 7. If packet fifo isn't empty, next state will be `TX_7_ST`. Otherwise, next state will be `CHK_8_ST`.
+9. `CHK_8_ST` - Analyze packet fifo for channel 8. If packet fifo isn't empty, next state will be `TX_8_ST`. Otherwise, next state will be `CHK_9_ST`.
+10. `CHK_9_ST` - Analyze packet fifo for channel 9. If packet fifo isn't empty, next state will be `TX_9_ST`. Otherwise, next state will be `CHK_A_ST`.
+11. `CHK_A_ST` - Analyze packet fifo for channel A. If packet fifo isn't empty, next state will be `TX_A_ST`. Otherwise, next state will be `CHK_B_ST`.
+12. `CHK_B_ST` - Analyze packet fifo for channel B. If packet fifo isn't empty, next state will be `TX_B_ST`. Otherwise, next state will be `CHK_C_ST`.
+13. `CHK_C_ST` - Analyze packet fifo for channel C. If packet fifo isn't empty, next state will be `TX_C_ST`. Otherwise, next state will be `CHK_D_ST`.
+14. `CHK_D_ST` - Analyze packet fifo for channel D. If packet fifo isn't empty, next state will be `TX_D_ST`. Otherwise, next state will be `CHK_E_ST`.
+15. `CHK_E_ST` - Analyze packet fifo for channel E. If packet fifo isn't empty, next state will be `TX_E_ST`. Otherwise, next state will be `CHK_F_ST`.
+16. `CHK_F_ST` - Analyze packet fifo for channel F. If packet fifo isn't empty, next state will be `TX_F_ST`. Otherwise, next state will be `CHK_0_ST`.
+17. `TX_0_ST` - Transmit data from fifo channel 0. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_1_ST`
+18. `TX_1_ST` - Transmit data from fifo channel 1. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_2_ST`
+19. `TX_2_ST` - Transmit data from fifo channel 2. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_3_ST`
+20. `TX_3_ST` - Transmit data from fifo channel 3. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_4_ST`
+21. `TX_4_ST` - Transmit data from fifo channel 4. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_5_ST`
+22. `TX_5_ST` - Transmit data from fifo channel 5. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_6_ST`
+23. `TX_6_ST` - Transmit data from fifo channel 6. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_7_ST`
+24. `TX_7_ST` - Transmit data from fifo channel 7. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_8_ST`
+25. `TX_8_ST` - Transmit data from fifo channel 8. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_9_ST`
+26. `TX_9_ST` - Transmit data from fifo channel 9. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_A_ST`
+27. `TX_A_ST` - Transmit data from fifo channel A. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_B_ST`
+28. `TX_B_ST` - Transmit data from fifo channel B. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_C_ST`
+29. `TX_C_ST` - Transmit data from fifo channel C. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_D_ST`
+30. `TX_D_ST` - Transmit data from fifo channel D. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_E_ST`
+31. `TX_E_ST` - Transmit data from fifo channel E. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_F_ST`
+32. `TX_F_ST` - Transmit data from fifo channel F. Transmission continues until the TLAST signal is read. If Tlast signal is read, next state will be `CHK_0_ST`
 
 Next figure show Finite state machine transition diagram
 
 ![fsm][logo1]
 
 ## Change log
-1. *v1.0* - first release
+1. 19.09.2019 : *v1.0* - first release 
 
 ## Related components
 1. fifo_in_sync_xpm
