@@ -39,10 +39,10 @@ Module supports asyncronous or syncronous.
 
 
 ### SlaveSerial interface
-** All signals in CLK_SS clock domain
+** All signals in `CLK_SS` clock domain
 * `CCLK` - clock output to external fpga. clock period the same as CLK_SS
 * `DIN` - bit output to external fpga, which corresponds bitstream. 
-* `DONE` - input from external fpga, which signaling successful ending of programming when DONE = 1, or when DONE = 0 signaling about programming failed or not completed
+* `DONE` - input from external fpga, which signaling successful ending of programming when `DONE` = 1, or when DONE = 0 signaling about programming failed or not completed
 * `INIT_B` - signal which used for response of beginning of program FPGA.
 * `PROG_B` - signal for beginning of programming
 
@@ -53,12 +53,12 @@ Constants doesn't presented
 ## Registers
 1. `r_in_dout_data` - this register perform bitshift. Most significant bit connected to output `DIN` for transmit data to external FPGA. 
 2. `bit_cnt` - bit counter. Limit for counting depends on the word length
-3. `clk_ss_sig` - clock signal same as CLK_SS. 
+3. `clk_ss_sig` - clock signal same as `CLK_SS`. 
 4. `prog_b_reg` - program_b register for transmit to external FPGA. 
 5. `wait_abort_cnt` - counter for abortion wait for signal `DONE` in `WAIT_DONE_ST` state. 
 
 
-## FSM description ( if is presented )
+## FSM description
 this component include finite state machine. Following description of states:
 1. `WAIT_PROG_ST` - state when fsm wait for input valid data from fifo. If fifo is empty, no transition on fsm. otherwise, if fifo is not empty, fsm goes to `RESET_FPGA_ST`
 2. `RESET_FPGA_ST` - state where fsm perform reset on fpga through `PROG_B` signal. Transition to next state perform when `INIT_B = 1`.
@@ -82,8 +82,8 @@ normal programming cycle presented on following picture
 
 
 ## Related modules
-1. fifo_in_sync_xpm - syncronous fifo which holded only data (S_AXIS_TDATA + S_AXIS_TKEEP + S_AXIS_TLAST)
-2. fifo_in_async_xpm - asyncronous fifo which holded only data (S_AXIS_TDATA + S_AXIS_TKEEP + S_AXIS_TLAST)
+1. `fifo_in_sync_xpm` - syncronous fifo which holded only data (S_AXIS_TDATA + S_AXIS_TKEEP + S_AXIS_TLAST)
+2. `fifo_in_async_xpm` - asyncronous fifo which holded only data (S_AXIS_TDATA + S_AXIS_TKEEP + S_AXIS_TLAST)
 
 
 ## Change log
