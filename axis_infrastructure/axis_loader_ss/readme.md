@@ -19,7 +19,6 @@ Module supports asyncronous or syncronous.
 1) `WAIT_ABORT_LIMIT` - number of clock periods for wait `DONE` signal from FPGA. if `DONE` signal doesn't asserted for this time, finite state machine returns to initial state for wait new data 
 2) `ASYNC_MODE` - use sync/async mode for programming interface and S_AXIS_* bus
 
-
 ## PORTS 
 
 ### Inputs
@@ -30,16 +29,15 @@ Module supports asyncronous or syncronous.
 
 
 ### AXI-Stream Slave interface 
-** All Signals in CLK clock domain ** 
+**All Signals in CLK clock domain** 
 * `S_AXIS_TDATA` - data input. Width 16 bits 
 * `S_AXIS_TKEEP` - input signal indicate valid bytes in current word. Width 2 bits. Ignored in current implementation
 * `S_AXIS_TVALID` - data valid signal
 * `S_AXIS_TLAST` - end of packet signal. Ignored in current implementation
 * `S_AXIS_TREADY` - device might work with data and signaling of ability for receive data.
 
-
 ### SlaveSerial interface
-** All signals in `CLK_SS` clock domain
+**All signals in `CLK_SS` clock domain**
 * `CCLK` - clock output to external fpga. clock period the same as CLK_SS
 * `DIN` - bit output to external fpga, which corresponds bitstream. 
 * `DONE` - input from external fpga, which signaling successful ending of programming when `DONE` = 1, or when DONE = 0 signaling about programming failed or not completed
@@ -49,14 +47,12 @@ Module supports asyncronous or syncronous.
 ## Constants 
 Constants doesn't presented
 
-
 ## Registers
 1. `r_in_dout_data` - this register perform bitshift. Most significant bit connected to output `DIN` for transmit data to external FPGA. 
 2. `bit_cnt` - bit counter. Limit for counting depends on the word length
 3. `clk_ss_sig` - clock signal same as `CLK_SS`. 
 4. `prog_b_reg` - program_b register for transmit to external FPGA. 
 5. `wait_abort_cnt` - counter for abortion wait for signal `DONE` in `WAIT_DONE_ST` state. 
-
 
 ## FSM description
 this component include finite state machine. Following description of states:
@@ -71,8 +67,7 @@ this component include finite state machine. Following description of states:
 FSM diagram with transitions presented in following picture
 ![fsm][logo1]
 
-
-## Diagram(if needed)
+## Diagram
 
 `r_in_dout_data` register structure and how its work presented in following picture 
 ![shifter][logo2]
@@ -87,7 +82,7 @@ normal programming cycle presented on following picture
 
 
 ## Change log
-1. 25.09.2019 : *v1.0* - first version
+1. 25.09.2019 : *v1.0* - first version, which support 2 byte AXI-Stream only, ignore TLAST and TKEEP signals. 
 
 
 [logo0]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_loader_ss/axis_loader_ss_struct.png
