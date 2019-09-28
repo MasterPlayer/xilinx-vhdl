@@ -432,12 +432,21 @@ begin
                             current_state <= current_state;
                         end if;
 
-                    when WRITE_HEADER_ST =>
-                        if head_cnt = HEAD_CNT_LIMIT_LOGIC then 
-                            current_state <= READ_FIRST_ST;
+                    when WRITE_HEADER_ST => 
+                        if out_awfull = '0' then 
+                            if head_cnt = HEAD_CNT_LIMIT_LOGIC then 
+                                current_state <= READ_FIRST_ST;
+                            else
+                                current_state <= current_state;
+                            end if;
                         else
-                            current_state <= current_state;
+                            current_state <= current_state;                            
                         end if;
+                        --if head_cnt = HEAD_CNT_LIMIT_LOGIC then 
+                        --    current_state <= READ_FIRST_ST;
+                        --else
+                        --    current_state <= current_state;
+                        --end if;
 
                     when READ_FIRST_ST =>   
                         if out_awfull = '0' then 
