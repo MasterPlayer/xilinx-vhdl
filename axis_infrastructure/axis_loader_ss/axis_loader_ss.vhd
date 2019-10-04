@@ -1,43 +1,10 @@
 library IEEE;
     use IEEE.STD_LOGIC_1164.ALL;
-
-
-package axis_loader_ss_pkg is
-        
-    component axis_loader_ss
-        generic(
-            WAIT_ABORT_LIMIT    :           integer := 100000000                                ;
-            ASYNC_MODE          :           boolean := true                                     
-        );
-        port(
-            
-            CLK                 :   in      std_logic                                           ;
-            RESET               :   in      std_logic                                           ;
-            CLK_SS              :   in      std_logic                                           ;
-            
-            PROG_DONE           :   in      std_logic                                           ;
-            -- CLK clock Domain 
-            S_AXIS_TDATA        :   in      std_logic_Vector ( 15 downto 0 )                    ;
-            S_AXIS_TKEEP        :   in      std_logic_Vector (  1 downto 0 )                    ;
-            S_AXIS_TVALID       :   in      std_logic                                           ;
-            S_AXIS_TLAST        :   in      std_logic                                           ;
-            S_AXIS_TREADY       :   out     std_logic                                           ;
-            -- CLK_SS clock domain
-            CCLK                :   out     std_logic                                           ;
-            DIN                 :   out     std_logic                                           ;
-            DONE                :   in      std_logic                                           ;
-            INIT_B              :   in      std_logic                                           ;
-            PROG_B              :   out     std_logic                                            
-
-        );
-    end component;
-end package ;
-
-
-library IEEE;
-    use IEEE.STD_LOGIC_1164.ALL;
     use ieee.std_logic_unsigned.all;
     use ieee.std_logic_arith.all;
+    use IEEE.math_real."ceil";
+    use IEEE.math_real."log2";
+
 
 library UNISIM;
     use UNISIM.VComponents.all;
@@ -45,29 +12,27 @@ library UNISIM;
 
 entity axis_loader_ss is
     generic(
-        WAIT_ABORT_LIMIT    :           integer := 100000000                                ; 
-        ASYNC_MODE          :           boolean := true                                     
+        WAIT_ABORT_LIMIT    :           integer := 100000000                                ;
+        ASYNC_MODE          :           boolean := true                                     ;
+        N_BYTES             :           integer := 2                                             -- Supports : 1/2/4/8 BYTES
+        -- if needed organize support for specified widths, which out of current list, 
+        -- please, add definition for cnt_limit_reg register. 
     );
     port(
-        
         CLK                 :   in      std_logic                                           ;
         RESET               :   in      std_logic                                           ;
         CLK_SS              :   in      std_logic                                           ;
-        
         PROG_DONE           :   in      std_logic                                           ;
-        -- CLK clock Domain 
-        S_AXIS_TDATA        :   in      std_logic_Vector ( 15 downto 0 )                    ;
-        S_AXIS_TKEEP        :   in      std_logic_Vector (  1 downto 0 )                    ;
+        S_AXIS_TDATA        :   in      std_logic_Vector ( (N_BYTES*8)-1 downto 0 )         ;
+        S_AXIS_TKEEP        :   in      std_logic_Vector (  N_BYTES-1 downto 0 )            ;
         S_AXIS_TVALID       :   in      std_logic                                           ;
         S_AXIS_TLAST        :   in      std_logic                                           ;
         S_AXIS_TREADY       :   out     std_logic                                           ;
-        -- CLK_SS clock domain
         CCLK                :   out     std_logic                                           ;
         DIN                 :   out     std_logic                                           ;
         DONE                :   in      std_logic                                           ;
         INIT_B              :   in      std_logic                                           ;
         PROG_B              :   out     std_logic                                            
-
     );
 end axis_loader_ss;
 
@@ -75,14 +40,20 @@ end axis_loader_ss;
 
 architecture axis_loader_ss_arch of axis_loader_ss is
 
-
     
     ATTRIBUTE X_INTERFACE_INFO : STRING;
     ATTRIBUTE X_INTERFACE_INFO of RESET: SIGNAL is "xilinx.com:signal:reset:1.0 RESET RST";
     ATTRIBUTE X_INTERFACE_PARAMETER : STRING;
     ATTRIBUTE X_INTERFACE_PARAMETER of RESET: SIGNAL is "POLARITY ACTIVE_HIGH";
 
-    constant version : string := "v1.0" ;
+    constant version : string := "v1.1" ;
+
+    constant DATA_WIDTH : integer := N_BYTES*8;
+
+    constant BIT_CNT_LIMIT  :   integer := (N_BYTES*8)-1;
+    constant BIT_CNT_WIDTH  :   integer := integer(ceil(log2(real(BIT_CNT_LIMIT))));
+    signal  bit_cnt         :           std_logic_vector ( BIT_CNT_WIDTH-1 downto 0 )     := (others => '0')  ;
+    signal  cnt_limit_reg   :           std_logic_vector ( BIT_CNT_WIDTH-1 downto 0 )     := (others => '1')  ;    
 
     component fifo_in_async_xpm
         generic(
@@ -110,7 +81,7 @@ architecture axis_loader_ss_arch of axis_loader_ss is
         );
     end component;
 
-    component fifo_in_sync_xpm is
+    component fifo_in_sync_xpm
         generic(
             DATA_WIDTH      :           integer         :=  16                          ;
             MEMTYPE         :           String          :=  "block"                     ;
@@ -134,48 +105,64 @@ architecture axis_loader_ss_arch of axis_loader_ss is
         );
     end component;
 
-    signal  in_dout_data    :           std_logic_vector ( 15 downto 0 )                    ;
-    signal  in_dout_keep    :           std_logic_Vector (  1 downto 0 )                    ;
-    signal  in_dout_last    :           std_logic                                           ;
-    signal  r_in_dout_data  :           std_logic_Vector ( 15 downto 0 )                    ;
-    signal  in_rden         :           std_logic                                           ;
-    signal  in_empty        :           std_logic                                           ;
+
+    signal  in_dout_data    :           std_logic_vector ( (N_BYTES*8)-1 downto 0 )     ;
+    signal  in_dout_keep    :           std_logic_Vector ( (N_BYTES-1) downto 0 )       ;
+    signal  in_dout_last    :           std_logic                                       ;
+    signal  in_rden         :           std_logic                                       ;
+    signal  in_empty        :           std_logic                                       ;
 
     type fsm is(
-        WAIT_PROG_ST       ,
-        RESET_FPGA_ST      ,
-        WAIT_FOR_INITB_ST  ,
-        PROG_FPGA_ST       ,
-        WAIT_DATA_ST       ,
-        WAIT_DONE_ST        
+        WAIT_PROG_ST        ,
+        RESET_FPGA_ST       ,
+        WAIT_FOR_INITB_ST   ,
+        PROG_FPGA_ST        ,
+        WAIT_DATA_ST        ,
+        WAIT_DONE_ST         
     );
+
+    signal  r_in_dout_data  :           std_logic_Vector ( DATA_WIDTH-1 downto 0 ) := (others => '0')   ;
 
     signal current_state : FSM := WAIT_PROG_ST;
 
-    signal  prog_b_reg      :           std_logic                           := '1'          ;
-    signal  bit_cnt         :           std_logic_vector ( 3 downto 0 )     := (others => '0')  ;
-    signal  clk_ss_sig      :           std_Logic                                               ;
-   
-    signal  last_flaq       :           std_logic                           := '0'              ;
+    signal  prog_b_reg          :           std_logic                           := '1'              ;
+    signal  clk_ss_sig          :           std_Logic                                               ;
+    signal  last_flaq           :           std_logic                           := '0'              ;
+    signal  wait_abort_cnt      :           std_logic_Vector ( 31 downto  0 )   := (others => '0')  ;
+    signal  S_AXIS_DATA_SWAP    :           std_logic_vector ( DATA_WIDTH-1 downto 0 ) := (others => '0');
 
-    signal  wait_abort_cnt  :           std_logic_Vector ( 31 downto  0 )   := (others => '0')  ;
+    component rst_syncer
+        generic(
+            INIT_VALUE                          :           bit             := '1'                                  
+        );
+        port(
+            CLK                                 :   in      std_logic                                               ;
+            RESET                               :   in      std_logic                                               ;
+            RESET_OUT                           :   out     std_logic                                               
+        );
+    end component;
+
+    signal  rst_ss                              :           std_logic   := '1'                                      ;
 
 
 begin
 
+    
+    SWAP_GEN : for i in 0 to N_BYTES-1 generate
+        S_AXIS_DATA_SWAP( (i*8) + 7 downto (i*8) ) <= S_AXIS_TDATA( ((DATA_WIDTH - (i*8))-1)  downto (DATA_WIDTH - ((i+1)*8)) ) ;
+    end generate; 
 
     clk_ss_sig      <=  CLK_SS                                      ;
 
-    CCLK            <=  clk_ss_sig when current_state = PROG_FPGA_ST else '0' ;
+    CCLK            <=  not(clk_ss_sig) when current_state = PROG_FPGA_ST else '0' ;
     PROG_B          <=  prog_b_reg                                  ;
-    DIN             <=  r_in_dout_data(15)                          ;
-
+    DIN             <=  r_in_dout_data(DATA_WIDTH-1)                          ;
 
     ASYNC_GEN_ON : if ASYNC_MODE = true generate 
         
         fifo_in_async_xpm_inst : fifo_in_async_xpm
             generic map (
-                DATA_WIDTH      =>  16                                  ,
+                DATA_WIDTH      =>  N_BYTES*8                           ,
                 CDC_SYNC        =>  4                                   ,
                 MEMTYPE         =>  "distributed"                       ,
                 DEPTH           =>  16                           
@@ -185,7 +172,7 @@ begin
                 S_AXIS_RESET    =>  RESET                               ,
                 M_AXIS_CLK      =>  CLK_SS                              ,
                 
-                S_AXIS_TDATA    =>  S_AXIS_TDATA( 7 downto 0 ) & S_AXIS_TDATA( 15 downto 8 ) ,
+                S_AXIS_TDATA    =>  S_AXIS_DATA_SWAP                    ,
                 S_AXIS_TKEEP    =>  S_AXIS_TKEEP                        ,
                 S_AXIS_TVALID   =>  S_AXIS_TVALID                       ,
                 S_AXIS_TLAST    =>  S_AXIS_TLAST                        ,
@@ -198,14 +185,25 @@ begin
                 IN_EMPTY        =>  in_empty                            
             );
 
-    end generate;
 
+        rst_syncer_inst_ss : rst_syncer
+            generic map (
+                INIT_VALUE      =>  '1'                  
+            )
+            port map (
+                CLK             =>  CLK_SS              ,
+                RESET           =>  RESET               ,
+                RESET_OUT       =>  rst_ss               
+            );
+
+
+    end generate;
 
     ASYNC_GEN_OFF : if ASYNC_MODE = false generate 
             
         fifo_in_sync_xpm_inst : fifo_in_sync_xpm
             generic map (
-                DATA_WIDTH      =>  16                                  ,
+                DATA_WIDTH      =>  N_BYTES*8                           ,
                 MEMTYPE         =>  "distributed"                       ,
                 DEPTH           =>  16                                   
             )
@@ -213,7 +211,7 @@ begin
                 CLK             =>  CLK                                 ,
                 RESET           =>  RESET                               ,
                 
-                S_AXIS_TDATA    =>  S_AXIS_TDATA( 7 downto 0 ) & S_AXIS_TDATA( 15 downto 8 ) ,
+                S_AXIS_TDATA    =>  S_AXIS_DATA_SWAP                    ,
                 S_AXIS_TKEEP    =>  S_AXIS_TKEEP                        ,
                 S_AXIS_TVALID   =>  S_AXIS_TVALID                       ,
                 S_AXIS_TLAST    =>  S_AXIS_TLAST                        ,
@@ -226,13 +224,14 @@ begin
                 IN_EMPTY        =>  in_empty                            
             );
 
+        rst_ss <= RESET;
 
     end generate;
 
-    wait_abort_cnt_processing : process(CLK)
+    wait_abort_cnt_processing : process(CLK_SS)
     begin
-        if CLK'event AND CLK = '1' then 
-            if RESET = '1' then 
+        if CLK_SS'event AND CLK_SS = '1' then 
+            if rst_ss = '1' then 
                 wait_abort_cnt <= (others => '0');
             else
                 case current_state is
@@ -248,7 +247,7 @@ begin
     current_state_processing : process(CLK_SS)
     begin
         if CLK_SS'event AND CLK_SS = '1' then 
-            if RESET = '1' then 
+            if rst_ss = '1' then 
                 current_state <= WAIT_PROG_ST;
             else
                 case current_state is
@@ -274,17 +273,20 @@ begin
                         end if;
 
                     when PROG_FPGA_ST =>
-                        if bit_cnt = x"F" then 
+                        if bit_cnt = cnt_limit_reg then 
                             if PROG_DONE = '1' then 
                                 current_state <= WAIT_DONE_ST;
-                            elsif in_empty = '0' then 
-                                current_state <= current_state;
                             else
-                                current_state <= WAIT_DATA_ST;    
+                                if in_empty = '1' then 
+                                    current_state <= WAIT_DATA_ST;
+                                else
+                                    current_state <= current_state;    
+                                end if;
                             end if;
                         else
-                            current_state <= current_state;
+                            current_state <= current_state;    
                         end if;
+
 
                     when WAIT_DATA_ST =>
                         if PROG_DONE = '1' then 
@@ -317,7 +319,7 @@ begin
     prog_b_reg_processing : process(CLK_SS)
     begin
         if CLK_SS'event AND CLK_SS = '1' then 
-            if RESET = '1' then 
+            if rst_ss = '1' then 
                 prog_b_reg <= '1';
             else
                 case current_state is
@@ -332,42 +334,21 @@ begin
     end process;
 
     in_rden_processing : process(CLK_SS)
-    begin 
+    begin
         if CLK_SS'event AND CLK_SS = '1' then 
-            if RESET = '1' then 
+            if rst_ss = '1' then 
                 in_rden <= '0';
             else
                 case current_state is
                     when PROG_FPGA_ST =>
-                        if bit_cnt = x"D" then 
+                        if bit_cnt = 0 then 
                             in_rden <= '1';
                         else
-                            in_rden <= '0';
-                        end if;
-
-                    when others => 
-                        in_rden <= '0';
-                end case;
-            end if;
-        end if;
-    end process;
-
-    bit_cnt_processing : process(CLK_SS)
-    begin
-        if CLK_SS'event AND CLK_SS = '1' then 
-            if RESET = '1' then 
-                bit_cnt <= (others => '0');
-            else
-                case current_state is
-                    when PROG_FPGA_ST =>
-                        if in_empty = '0' then 
-                            bit_cnt <= bit_cnt + 1;
-                        else
-                            bit_cnt <= (others => '0');
+                            in_rden <= '0';    
                         end if;
 
                     when others =>
-                        bit_cnt <= (others => '0');
+                        in_rden <= '0';
                 end case;
             end if;
         end if;
@@ -376,25 +357,125 @@ begin
     r_in_dout_data_processing : process(CLK_SS)
     begin
         if CLK_SS'event AND CLK_SS = '1' then 
+            case current_state is
+              
+                when WAIT_PROG_ST | WAIT_DATA_ST =>
+                    if (in_empty = '0') then 
+                        r_in_dout_data <= in_dout_data;
+                    else
+                        r_in_dout_data <= r_in_dout_data;
+                    end if;
+
+                when PROG_FPGA_ST =>
+                    if bit_cnt = cnt_limit_reg then 
+                        r_in_dout_data <= in_dout_data;    
+                    else
+                        r_in_dout_data <= r_in_dout_data(DATA_WIDTH-2 downto 0 ) & r_in_dout_data(DATA_WIDTH-1);
+                    end if;
+
+                when others =>
+                    r_in_dout_data <= r_in_dout_data;
+
+            end case;
+        end if;
+    end process;
+
+    bit_cnt_processing : process(CLK_SS)
+    begin
+        if CLK_SS'event AND CLK_SS = '1' then 
             if RESET = '1' then 
-                r_in_dout_data <= (others => '0');
+                bit_cnt <= (others => '0') ;
             else
                 
                 case current_state is
-                    when WAIT_FOR_INITB_ST | WAIT_DATA_ST =>
-                        r_in_dout_data <= in_dout_data( 15 downto 0 );
-
                     when PROG_FPGA_ST =>
-                        if bit_cnt = x"F" then 
-                            r_in_dout_data <= in_dout_data(15 downto 0 );
-                        else                    
-                            r_in_dout_data <= r_in_dout_data( 14 downto 0 ) & r_in_dout_data(15);
-                        end if;                
+                        if bit_cnt < cnt_limit_reg then 
+                            bit_cnt <= bit_cnt + 1;
+                        else
+                            bit_cnt <= (others => '0');
+                        end if; 
+
                     when others =>
-                        r_in_dout_data <= r_in_dout_data;
+                        bit_cnt <= (others => '0');
+                
                 end case;
+            end if;
+        end if; 
+    end process;
+
+    GEN_LIMITS_x8 : if N_BYTES = 1 generate 
+        cnt_limit_reg <= "111";
+    end generate;
+
+    GEN_LIMITS_x16 : if N_BYTES = 2 generate 
+        cnt_limit_reg_processing : process(CLK_SS)
+        begin 
+            if CLK_SS'event AND CLK_SS = '1' then 
+                if in_rden = '1' then 
+                    case in_dout_keep is
+                        when "11"   => cnt_limit_reg <= conv_std_logic_Vector ( 15, cnt_limit_reg'length);
+                        when "01"   => cnt_limit_reg <= conv_std_logic_Vector (  7, cnt_limit_reg'length);
+                        when others => cnt_limit_reg <= conv_std_logic_Vector ( 15, cnt_limit_reg'length);
+                    end case;
+                else
+                    cnt_limit_reg <= cnt_limit_reg;
+                end if;
+            end if;
+        end process;
+    end generate;
+
+    GEN_LIMITS_x32 : if N_BYTES = 4 generate 
+        cnt_limit_reg_processing : process(CLK_SS)
+        begin 
+            if CLK_SS'event AND CLK_SS = '1' then 
+                if in_rden = '1' then 
+                    case in_dout_keep is
+                        when "1111" => cnt_limit_reg <= conv_std_logic_Vector ( 31, cnt_limit_reg'length);
+                        when "0111" => cnt_limit_reg <= conv_std_logic_Vector ( 23, cnt_limit_reg'length);
+                        when "0011" => cnt_limit_reg <= conv_std_logic_Vector ( 15, cnt_limit_reg'length);
+                        when "0001" => cnt_limit_reg <= conv_std_logic_Vector (  7, cnt_limit_reg'length);
+                        when others => cnt_limit_reg <= conv_std_logic_Vector ( 31, cnt_limit_reg'length);
+                    end case;
+                else
+                    cnt_limit_reg <= cnt_limit_reg;    
+                end if;
+            end if;
+        end process;
+    end generate;
+
+    GEN_LIMITS_x64 : if N_BYTES = 8 generate 
+        cnt_limit_reg_processing : process(CLK_SS)
+        begin 
+            if CLK_SS'event AND CLK_SS = '1' then 
+                if in_rden = '1' then 
+                    case in_dout_keep is
+                        when "11111111" => cnt_limit_reg <= conv_std_logic_Vector ( 63, cnt_limit_reg'length);
+                        when "01111111" => cnt_limit_reg <= conv_std_logic_Vector ( 55, cnt_limit_reg'length);
+                        when "00111111" => cnt_limit_reg <= conv_std_logic_Vector ( 47, cnt_limit_reg'length);
+                        when "00011111" => cnt_limit_reg <= conv_std_logic_Vector ( 39, cnt_limit_reg'length);
+                        when "00001111" => cnt_limit_reg <= conv_std_logic_Vector ( 31, cnt_limit_reg'length);
+                        when "00000111" => cnt_limit_reg <= conv_std_logic_Vector ( 23, cnt_limit_reg'length);
+                        when "00000011" => cnt_limit_reg <= conv_std_logic_Vector ( 15, cnt_limit_reg'length);
+                        when "00000001" => cnt_limit_reg <= conv_std_logic_Vector (  7, cnt_limit_reg'length);
+                        when others     => cnt_limit_reg <= conv_std_logic_Vector ( 31, cnt_limit_reg'length);
+                    end case;
+                else
+                    cnt_limit_reg <= cnt_limit_reg;    
+                end if;
+            end if;
+        end process;
+    end generate;
+
+    last_flaq_processing : process(CLK_SS)
+    begin
+        if CLK_SS'event AND CLK_SS = '1' then 
+            if in_rden = '1' then 
+                last_flaq <= in_dout_last;
+            else
+                last_flaq <= last_flaq;
             end if;
         end if;
     end process;
+
 
 end axis_loader_ss_arch;
