@@ -28,6 +28,11 @@ Include parametrized fifo, which realized with Xilinx Parametrized Macros
 7. fifo_cmd_sync_xpm
 8. fifo_out_sync_xpm_id
 
+## RAM parametrized
+include modules for generate ram memory
+1. tdpram
+2. sdpram
+
 
 ## Syncronizers
 Data Syncronizers, reset syncronizers
