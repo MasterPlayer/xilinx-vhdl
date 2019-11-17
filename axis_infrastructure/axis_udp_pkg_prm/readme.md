@@ -4,9 +4,12 @@
 
 Parametrized component for package input traffic to udp packets with envelope MAC/IP/UDP headers
 
+
 ![structure of component][logo_struct]
 
+
 ![data format][logo_data_format]
+
 
 ## GENERIC
 this component have next configurable parameters
@@ -18,19 +21,21 @@ this component have next configurable parameters
 ## PORTS
 
 ### AXI-Stream Slave interface
-    `S_AXIS_CLK` - clock signal for `S_AXIS_` bus. 
-    `S_AXIS_RESET` - reset signal for `S_AXIS_` bus
-    `S_AXIS_TDATA` - Data signal from source. Configurable with parameter `N_BYTES`. 
-    `S_AXIS_TVALID` - Data valid signal 
-    `S_AXIS_TREADY` - Data ready signal to source. If internal fifo is full, this signal is '0', otherwise, this signal is '1'
+
+    - `S_AXIS_CLK` - clock signal for `S_AXIS_` bus. 
+    - `S_AXIS_RESET` - reset signal for `S_AXIS_` bus
+    - `S_AXIS_TDATA` - Data signal from source. Configurable with parameter `N_BYTES`. 
+    - `S_AXIS_TVALID` - Data valid signal 
+    - `S_AXIS_TREADY` - Data ready signal to source. If internal fifo is full, this signal is '0', otherwise, this signal is '1'
 
 ### AXI-Stream Master interface
-    `M_AXIS_CLK` - clock signal for M_AXIS_ bus and all internal logic
-    `M_AXIS_TDATA` - data signal, Width configurable with `N_BYTES` parameter.
-    `M_AXIS_TKEEP` - signal for data present in vector. Width configurable width `N_BYTES` parameter.
-    `M_AXIS_TVALID` - signal for data valid
-    `M_AXIS_TREADY` - data ready signal from destination component. 
-    `M_AXIS_TLAST` - signal for packet boundary.
+
+    - `M_AXIS_CLK` - clock signal for `M_AXIS_` bus and all internal logic
+    - `M_AXIS_TDATA` - data signal, Width configurable with `N_BYTES` parameter.
+    - `M_AXIS_TKEEP` - signal for data present in vector. Width configurable width `N_BYTES` parameter.
+    - `M_AXIS_TVALID` - signal for data valid
+    - `M_AXIS_TREADY` - data ready signal from destination component. 
+    - `M_AXIS_TLAST` - signal for packet boundary.
     
 ### Inputs 
     `SIZE` - size of packet in words. Needed for generate `TLAST` signal, because input S_AXIS_* port doesn't have `TLAST` signal. Width 16 bit.
@@ -74,7 +79,7 @@ this component have next configurable parameters
     2) `current_state` : finite state machine signal
     3) `last_cnt` - register for counting packet size for generate TLAST signal
 
-## FSM description 
+## FSM description
     There are Finite state machine presented. The FSM include the next states :
     1) `IDLE_ST` - in this state we wait for new data for packaging with headers. Transition to `WRITE_HEADER_ST` is allowed when output fifo isn't full, input fifo isn't empty, and ipv4 calculator completely calculate checksum.
     2) `READ_FIRST_ST` - in this state we read first word from input fifo for realize realignment in data vector.
@@ -94,6 +99,7 @@ this component have next configurable parameters
 
 ## Change log
     1. 17.11.2019 : v1.0 - first version
+
 
 [logo_fsm]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_udp_pkg_prm/axis_udp_pkg_prm_fsm.png
 [logo_struct]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_udp_pkg_prm/axis_udp_pkg_prm_struct.png
