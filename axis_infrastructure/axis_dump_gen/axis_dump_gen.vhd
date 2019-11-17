@@ -315,7 +315,7 @@ begin
                             when 255        => out_din_last <= '1';
                             when others     => out_din_last <= '0';
                         end case;
-
+                        
                     when others =>
                         out_din_last <= out_din_last;
 
