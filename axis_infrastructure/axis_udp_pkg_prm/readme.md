@@ -95,6 +95,6 @@ this component have next configurable parameters
 ## Change log
     1. 17.11.2019 : v1.0 - first version
 
-[logo_fsm]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_6_to_1/axis_pkt_sw_6_to_1_struct.png
-[logo_struct]
-logo_data_format]
+[logo_fsm]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_udp_pkg_prm/axis_udp_pkg_prm_fsm.png
+[logo_struct]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_udp_pkg_prm/axis_udp_pkg_prm_struct.png
+logo_data_format]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_udp_pkg_prm/axis_udp_pkg_prm_format.png
