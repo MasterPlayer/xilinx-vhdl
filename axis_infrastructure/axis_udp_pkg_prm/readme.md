@@ -7,6 +7,7 @@ Parametrized component for package input traffic to udp packets with envelope MA
 
 ![structure of component][logo_struct]
 
+output of this component is next format: 
 
 ![data format][logo_data_format]
 
