@@ -58,6 +58,7 @@ because you must avoid situations, when packet_fifo overloaded, but data fifo is
 * `S_AXIS_TVALID_*` - input port for indicate valid data on bus
 * `S_AXIS_TREADY_*` - output port for signaling ability to receive data 
 * `S_AXIS_TLAST_*` - input signal for indicates the boundary of packet
+
 ### AXI-Stream Master interface
 * `M_AXIS_TDATA_*` - output data bus. Data width configured with `N_BYTES*8` parameter 
 * `M_AXIS_TKEEP_*` - output bus which indicate valid bytes in word. Width configured with `N_BYTES` parameter
