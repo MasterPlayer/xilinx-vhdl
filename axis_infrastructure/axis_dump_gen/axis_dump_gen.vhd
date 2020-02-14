@@ -1,3 +1,10 @@
+-- 26.11.2016 : updated to v1.1 :: Fixed bug for signal tlast : 
+--      only when counter arrivals for value 255 words, 
+--      tlast signal assert => signal assert when word 
+--      counter assigned WORD_LIMIT value
+
+
+
 library IEEE;
     use IEEE.STD_LOGIC_1164.ALL;
     use ieee.std_logic_unsigned.all;
@@ -12,7 +19,8 @@ library UNISIM;
 entity axis_dump_gen is
     generic(
         N_BYTES                 :           integer                         := 2                ;
-        ASYNC                   :           boolean                         := false              
+        ASYNC                   :           boolean                         := false            ;
+        SIMPLE_COUNTER          :           boolean                         := false              -- if true then data word as one counter, else - array of 8bit counters
     );
     port(
         CLK                     :   in      std_logic                                           ;
@@ -35,7 +43,7 @@ end axis_dump_gen;
 
 architecture axis_dump_gen_arch of axis_dump_gen is
     
-    constant VERSION : string := "v1.0";
+    constant VERSION : string := "v1.2";
     
     ATTRIBUTE X_INTERFACE_INFO : STRING;
     ATTRIBUTE X_INTERFACE_INFO of RESET: SIGNAL is "xilinx.com:signal:reset:1.0 RESET RST";
@@ -311,10 +319,17 @@ begin
             else                
                 case current_state is
                     when TX_ST =>
-                        case conv_integer(word_cnt) is
-                            when 255        => out_din_last <= '1';
-                            when others     => out_din_last <= '0';
-                        end case;
+
+                    -- 26.11.2016 :: Fixed bug for signal tlast : only when counter arrivals for value 255 words, tlast signal assert => signal assert when word counter assigned WORD_LIMIT value
+                        --case conv_integer(word_cnt) is
+                            --when 255        => out_din_last <= '1';
+                        --    when others     => out_din_last <= '0';
+                        --end case;
+                        if (word_cnt = WORD_LIMIT) then 
+                            out_din_last <= '1';
+                        else
+                            out_din_last <= '0';
+                        end if;
                         
                     when others =>
                         out_din_last <= out_din_last;
@@ -324,26 +339,58 @@ begin
         end if;
     end process;
 
-    gen_vector_cnt : for i in 0 to N_BYTES-1 generate 
+
+    -- Data vector presented as array of 8-bit counters
+    GEN_SIMPLE_COUNTER_OFF : if SIMPLE_COUNTER = false generate
+        gen_vector_cnt : for i in 0 to N_BYTES-1 generate 
+            cnt_vector_processing : process(CLK)
+            begin
+                if CLK'event AND CLK = '1' then 
+                    if RESET = '1' then 
+                        cnt_vector( (((i+1)*8)-1) downto  (i*8)) <= conv_std_logic_Vector( ((256 - N_BYTES) + i) , 8);
+                    else
+                        case current_state is
+                            when TX_ST =>
+                                if out_awfull = '0' then 
+                                    cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8)) + conv_std_logic_Vector(N_BYTES, 8);
+                                else
+                                    cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8));
+                                end if;
+                            when others =>
+                                cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8));
+                        end case;
+                    end if;
+                end if;
+            end process;
+        end generate;
+    end generate;
+
+
+    -- Data word presented as simple counter, which width presented as (N_BYTES*8 downto 0) bits
+    GEN_SIMPLE_COUNTER_ON : if SIMPLE_COUNTER = true generate
+
         cnt_vector_processing : process(CLK)
         begin
             if CLK'event AND CLK = '1' then 
                 if RESET = '1' then 
-                    cnt_vector( (((i+1)*8)-1) downto  (i*8)) <= conv_std_logic_Vector( ((256 - N_BYTES) + i) , 8);
+                    cnt_vector <= (others => '0');
                 else
                     case current_state is
                         when TX_ST =>
                             if out_awfull = '0' then 
-                                cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8)) + conv_std_logic_Vector(N_BYTES, 8);
+                                cnt_vector <= cnt_vector + 1;
                             else
-                                cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8));
+                                cnt_vector <= cnt_vector;
                             end if;
+
                         when others =>
-                            cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8));
+                            cnt_vector <= cnt_vector;
+                    
                     end case;
                 end if;
             end if;
         end process;
+
     end generate;
 
 

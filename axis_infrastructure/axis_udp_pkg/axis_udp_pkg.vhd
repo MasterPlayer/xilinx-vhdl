@@ -416,7 +416,7 @@ begin
 
     S_AXIS_TREADY <= s_axis_tready_sig;
 
-    in_rden <= '1' when out_awfull = '0' and in_empty = '0' and (current_state = WRITE_DATA_ST or current_state = READ_FIRST_ST) else '0';
+    in_rden <= '1' when out_awfull = '0' and in_empty = '0' and (current_state = WRITE_DATA_ST) else '0';
 
     current_state_processing : process(M_AXIS_CLK)
     begin
