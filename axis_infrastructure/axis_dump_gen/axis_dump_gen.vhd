@@ -20,7 +20,8 @@ entity axis_dump_gen is
     generic(
         N_BYTES                 :           integer                         := 2                ;
         ASYNC                   :           boolean                         := false            ;
-        SIMPLE_COUNTER          :           boolean                         := false              -- if true then data word as one counter, else - array of 8bit counters
+        SIMPLE_COUNTER          :           boolean                         := false            ; -- if true then data word as one counter, else - array of 8bit counters
+        FILL_ZEROS              :           boolean                         := false             
     );
     port(
         CLK                     :   in      std_logic                                           ;
@@ -342,54 +343,73 @@ begin
 
     -- Data vector presented as array of 8-bit counters
     GEN_SIMPLE_COUNTER_OFF : if SIMPLE_COUNTER = false generate
-        gen_vector_cnt : for i in 0 to N_BYTES-1 generate 
-            cnt_vector_processing : process(CLK)
-            begin
-                if CLK'event AND CLK = '1' then 
-                    if RESET = '1' then 
-                        cnt_vector( (((i+1)*8)-1) downto  (i*8)) <= conv_std_logic_Vector( ((256 - N_BYTES) + i) , 8);
-                    else
-                        case current_state is
-                            when TX_ST =>
-                                if out_awfull = '0' then 
-                                    cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8)) + conv_std_logic_Vector(N_BYTES, 8);
-                                else
+
+
+        GEN_NO_ZEROS : if FILL_ZEROS = false generate
+            gen_vector_cnt : for i in 0 to N_BYTES-1 generate 
+
+                cnt_vector_processing : process(CLK)
+                begin
+                    if CLK'event AND CLK = '1' then 
+                        if RESET = '1' then 
+                            cnt_vector( (((i+1)*8)-1) downto  (i*8)) <= conv_std_logic_Vector( ((256 - N_BYTES) + i) , 8);
+                        else
+                            case current_state is
+                                when TX_ST =>
+                                    if out_awfull = '0' then 
+                                        cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8)) + conv_std_logic_Vector(N_BYTES, 8);
+                                    else
+                                        cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8));
+                                    end if;
+                                when others =>
                                     cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8));
-                                end if;
-                            when others =>
-                                cnt_vector((((i+1)*8)-1) downto  (i*8)) <= cnt_vector((((i+1)*8)-1) downto  (i*8));
-                        end case;
+                            end case;
+                        end if;
                     end if;
-                end if;
-            end process;
+                end process;
+            end generate;
+
         end generate;
+
+        GEN_ZEROS : if FILL_ZEROS = true generate 
+            cnt_vector <= (others => '0');
+        end generate;
+    
     end generate;
 
 
     -- Data word presented as simple counter, which width presented as (N_BYTES*8 downto 0) bits
     GEN_SIMPLE_COUNTER_ON : if SIMPLE_COUNTER = true generate
 
-        cnt_vector_processing : process(CLK)
-        begin
-            if CLK'event AND CLK = '1' then 
-                if RESET = '1' then 
-                    cnt_vector <= (others => '0');
-                else
-                    case current_state is
-                        when TX_ST =>
-                            if out_awfull = '0' then 
-                                cnt_vector <= cnt_vector + 1;
-                            else
-                                cnt_vector <= cnt_vector;
-                            end if;
+        GEN_NO_ZEROS : if FILL_ZEROS = false generate
+            cnt_vector_processing : process(CLK)
+            begin
+                if CLK'event AND CLK = '1' then 
+                    if RESET = '1' then 
+                        cnt_vector <= (others => '0');
+                    else
+                        --case current_state is
+                            --when TX_ST =>
+                                if out_wren = '1' then 
+                                    cnt_vector <= cnt_vector + 1;
+                                else
+                                    cnt_vector <= cnt_vector;
+                                end if;
 
-                        when others =>
-                            cnt_vector <= cnt_vector;
-                    
-                    end case;
+                            --when others =>
+                                --cnt_vector <= cnt_vector;
+                        
+                        --end case;
+                    end if;
                 end if;
-            end if;
-        end process;
+            end process;
+
+        end generate;
+
+        GEN_ZEROS : if FILL_ZEROS = true generate 
+            cnt_vector <= (others => '0');
+        end generate;
+
 
     end generate;
 
