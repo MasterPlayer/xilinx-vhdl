@@ -3,7 +3,9 @@
 --      tlast signal assert => signal assert when word 
 --      counter assigned WORD_LIMIT value
 
-
+-- 18.06.2020:: 
+--      WORD_LIMIT used only in idle_st when we transit to other state. For counting current words use word_limit_reg
+--      Fixed transition from IDLE to DATA without PAUSE, only when PAUSE = 0 
 
 library IEEE;
     use IEEE.STD_LOGIC_1164.ALL;
@@ -44,7 +46,7 @@ end axis_dump_gen;
 
 architecture axis_dump_gen_arch of axis_dump_gen is
     
-    constant VERSION : string := "v1.2";
+    constant VERSION : string := "v1.3";
     
     ATTRIBUTE X_INTERFACE_INFO : STRING;
     ATTRIBUTE X_INTERFACE_INFO of RESET: SIGNAL is "xilinx.com:signal:reset:1.0 RESET RST";
@@ -122,7 +124,31 @@ architecture axis_dump_gen_arch of axis_dump_gen is
     signal  word_cnt            :           std_logic_vector (  15 downto 0 )   := (others => '0')  ;
     signal  cnt_vector          :           std_logic_Vector ( DATA_WIDTH-1 downto 0 ) := (others => '0');
 
+    signal  word_limit_reg      :           std_logic_vector ( 31 downto 0 ) := (others => '0')         ;
+
 begin
+
+    word_limit_reg_processing : process(CLK)
+    begin
+        if CLK'event AND CLK = '1' then 
+            case current_state is
+                when IDLE_ST => 
+                    if ENABLE = '1' then 
+                        if out_awfull = '0' then 
+                            word_limit_reg <= WORD_LIMIT;
+                        else
+                            word_limit_reg <= word_limit_reg;    
+                        end if;
+                    else
+                        word_limit_reg <= word_limit_reg;
+                    end if;
+                
+                when others => 
+                    word_limit_reg <= word_limit_reg;
+
+            end case;
+        end if;
+    end process;
 
     pause_reg_processing : process(CLK)
     begin
@@ -173,7 +199,11 @@ begin
                     when IDLE_ST =>
                         if ENABLE = '1' then 
                             if out_awfull = '0' then 
-                                current_state <= PAUSE_ST;
+                                if PAUSE = 0 then 
+                                    current_state <= TX_ST;
+                                else
+                                    current_state <= PAUSE_ST;
+                                end if;
                             else
                                 current_state <= current_state;    
                             end if;
@@ -190,7 +220,7 @@ begin
 
                     when TX_ST =>
                         if out_awfull = '0' then 
-                            if word_cnt = WORD_LIMIT then 
+                            if word_cnt = word_limit_reg then 
                                 current_state <= IDLE_ST;
                             else
                                 current_state <= current_state;
@@ -326,7 +356,7 @@ begin
                             --when 255        => out_din_last <= '1';
                         --    when others     => out_din_last <= '0';
                         --end case;
-                        if (word_cnt = WORD_LIMIT) then 
+                        if (word_cnt = word_limit_reg) then 
                             out_din_last <= '1';
                         else
                             out_din_last <= '0';
