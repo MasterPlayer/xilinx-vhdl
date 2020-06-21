@@ -39,8 +39,10 @@ Work principles :
 `M_AXIS_TKEEP` always sets is "1", because byte mode in axi_stream is not supported for current version on generator
 
 Current speed of generator (if TREADY always is set '1') following next rule : 
+
 **SPEED = (WORD_LIMIT/(WORD_LIMIT + PAUSE)) x (N_BYTESx8) x CLK_PERIOD**
-где `SPEED` - speed in bit per second
+
+where `SPEED` - speed in bit per second
 `WORD_LIMIT` - number of words in packet
 `PAUSE` - size of pause in clock periods
 `N_BYTES` - size of data bus in bytes
@@ -52,24 +54,24 @@ Current speed of generator (if TREADY always is set '1') following next rule :
 
 ## Change Log:
 
-1. 11.08.2019 v1.0 - first version
+**1. 11.08.2019 v1.0 - first version**
 - Works only with array on 8-bit counters, which distributed in N_BYTES bus
 - Supports AXI-Stream bus
 - Supports CDC mode
 
-2. 17.11.2019 v1.1 - update changes, no logic changes
+**2. 17.11.2019 v1.1 - update changes, no logic changes**
 
-3. 14.02.2020 v1.2 - changes on generator
+**3. 14.02.2020 v1.2 - changes on generator**
 - Add mode when counter = N_BYTES width and counter presented as single counter in data bus
 
-4. 26.03.2020 v1.2 - changes on generator:
+**4. 26.03.2020 v1.2 - changes on generator**
 - Add mode when output data presented as zeros
 - limits of component :
 1) PAUSE = 0 is not supported
 2) not recommended transit from big size packets to smaller size packets
 3) WORD_LIMIT and PAUSE must be set less by one from actual packet_size and pause_size respectively. For example : for generate 8192 bytes packets if N_BYTES = 8, we need set generator WORD_LIMIT as 0x000003FFh(1023 in decimal)
 
-5. 18.06.2020 v1.3 - changes on generator
+**5. **18.06.2020 v1.3 - changes on generator**
 - add support for PAUSE = 0
 - Add support for reduce packet size in some moment
 - Changes of generic : all three modes select with one generic parameter `MODE`, not two.
