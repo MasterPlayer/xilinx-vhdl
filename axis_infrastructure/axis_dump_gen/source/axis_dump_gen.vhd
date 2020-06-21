@@ -11,6 +11,8 @@ library IEEE;
     use IEEE.STD_LOGIC_1164.ALL;
     use ieee.std_logic_unsigned.all;
     use ieee.std_logic_arith.all;
+    use IEEE.math_real."ceil";
+    use IEEE.math_real."log2";
 
 
 library UNISIM;
@@ -19,11 +21,10 @@ library UNISIM;
 
 
 entity axis_dump_gen is
-    generic(
+    generic (
         N_BYTES                 :           integer                         := 2                ;
         ASYNC                   :           boolean                         := false            ;
-        SIMPLE_COUNTER          :           boolean                         := false            ; -- if true then data word as one counter, else - array of 8bit counters
-        FILL_ZEROS              :           boolean                         := false             
+        MODE                    :           string                          := "SINGLE"          -- "SINGLE", "ZEROS", "BYTE"
     );
     port(
         CLK                     :   in      std_logic                                           ;
@@ -46,7 +47,7 @@ end axis_dump_gen;
 
 architecture axis_dump_gen_arch of axis_dump_gen is
     
-    constant VERSION : string := "v1.3";
+    constant VERSION : string := "v1.4";
     
     ATTRIBUTE X_INTERFACE_INFO : STRING;
     ATTRIBUTE X_INTERFACE_INFO of RESET: SIGNAL is "xilinx.com:signal:reset:1.0 RESET RST";
@@ -126,7 +127,20 @@ architecture axis_dump_gen_arch of axis_dump_gen is
 
     signal  word_limit_reg      :           std_logic_vector ( 31 downto 0 ) := (others => '0')         ;
 
+    signal  m_axis_tdata_sig    :           std_logic_Vector ( DATA_WIDTH-1 downto 0 )      ;
+    signal  m_axis_tkeep_sig    :           std_logic_Vector (( DATA_WIDTH/8)-1 downto 0 )  ;
+    signal  m_axis_tvalid_sig   :           std_logic                                       ;
+    signal  m_axis_tlast_sig    :           std_logic                                       ;
+
 begin
+
+    
+
+    M_AXIS_TDATA                <=  m_axis_tdata_sig     ;
+    M_AXIS_TKEEP                <=  m_axis_tkeep_sig     ;
+    M_AXIS_TVALID               <=  m_axis_tvalid_sig    ;
+    M_AXIS_TLAST                <=  m_axis_tlast_sig     ;
+
 
     word_limit_reg_processing : process(CLK)
     begin
@@ -135,14 +149,33 @@ begin
                 when IDLE_ST => 
                     if ENABLE = '1' then 
                         if out_awfull = '0' then 
-                            word_limit_reg <= WORD_LIMIT;
+                            word_limit_reg <= WORD_LIMIT-1;
                         else
                             word_limit_reg <= word_limit_reg;    
                         end if;
                     else
                         word_limit_reg <= word_limit_reg;
                     end if;
-                
+
+                when TX_ST => 
+                    if out_awfull = '0' then 
+                        if word_cnt = word_limit_reg then
+                            if PAUSE = 0 then 
+                                if ENABLE = '1' then 
+                                    word_limit_reg <= WORD_LIMIT-1;
+                                else
+                                    word_limit_reg <= word_limit_reg;    
+                                end if;
+                            else
+                                word_limit_reg <= word_limit_reg;     
+                            end if; 
+                        else
+                            word_limit_reg <= word_limit_reg;
+                        end if;
+                    else
+                        word_limit_reg <= word_limit_reg;    
+                    end if;
+
                 when others => 
                     word_limit_reg <= word_limit_reg;
 
@@ -159,7 +192,18 @@ begin
                 case current_state is 
                     
                     when IDLE_ST =>
-                        pause_reg <= PAUSE;
+                        pause_reg <= PAUSE;    
+
+                    when TX_ST =>
+                        if out_awfull = '0' then 
+                            if word_cnt = word_limit_reg then 
+                                pause_reg <= PAUSE;    
+                            else
+                                pause_reg <= pause_reg;
+                            end if;
+                        else
+                            pause_reg <= pause_reg;
+                        end if;
                     
                     when others => 
                         pause_reg <= pause_reg;
@@ -173,7 +217,7 @@ begin
     begin
         if CLK'event AND CLK = '1' then 
             if RESET = '1' then 
-                pause_cnt <= (others => '0');
+                pause_cnt <= x"00000001";
             else
                 
                 case( current_state ) is
@@ -182,7 +226,7 @@ begin
                         pause_cnt <= pause_cnt + 1;
 
                     when others =>  
-                        pause_cnt <= (others => '0');
+                        pause_cnt <= x"00000001";
                 
                 end case ;
             end if;
@@ -197,7 +241,7 @@ begin
             else
                 case current_state is
                     when IDLE_ST =>
-                        if ENABLE = '1' then 
+                        if ENABLE = '1' and WORD_LIMIT /= 0 then 
                             if out_awfull = '0' then 
                                 if PAUSE = 0 then 
                                     current_state <= TX_ST;
@@ -212,16 +256,28 @@ begin
                         end if;
 
                     when PAUSE_ST =>
-                        if pause_cnt = pause_reg then 
+                        if pause_reg = 0 then 
                             current_state <= TX_ST;
                         else
-                            current_state <= current_state;
+                            if pause_cnt = pause_reg then 
+                                current_state <= TX_ST;
+                            else
+                                current_state <= current_state;
+                            end if;
                         end if;
 
                     when TX_ST =>
                         if out_awfull = '0' then 
-                            if word_cnt = word_limit_reg then 
-                                current_state <= IDLE_ST;
+                            if word_cnt = word_limit_reg then
+                                if pause_reg = 0 then 
+                                    if ENABLE = '1' and WORD_LIMIT /= 0 then 
+                                        current_state <= current_state;
+                                    else
+                                        current_state <= IDLE_ST;    
+                                    end if;
+                                else
+                                    current_state <= PAUSE_ST;     
+                                end if; 
                             else
                                 current_state <= current_state;
                             end if;
@@ -247,7 +303,11 @@ begin
                 case current_state is
                     when TX_ST =>
                         if out_awfull = '0' then 
-                            word_cnt <= word_cnt + 1;
+                            if word_cnt = word_limit_reg then 
+                                word_cnt <= (others => '0');
+                            else
+                                word_cnt <= word_cnt + 1;
+                            end if;
                         else
                             word_cnt <= word_cnt;
                         end if;
@@ -281,10 +341,10 @@ begin
                 OUT_AWFULL      =>  out_awfull                                      ,
 
                 M_AXIS_CLK      =>  M_AXIS_CLK                                      ,
-                M_AXIS_TDATA    =>  M_AXIS_TDATA                                    ,
-                M_AXIS_TKEEP    =>  M_AXIS_TKEEP                                    ,
-                M_AXIS_TVALID   =>  M_AXIS_TVALID                                   ,
-                M_AXIS_TLAST    =>  M_AXIS_TLAST                                    ,
+                M_AXIS_TDATA    =>  m_axis_tdata_sig                                ,
+                M_AXIS_TKEEP    =>  m_axis_tkeep_sig                                ,
+                M_AXIS_TVALID   =>  m_axis_tvalid_sig                               ,
+                M_AXIS_TLAST    =>  m_axis_tlast_sig                                ,
                 M_AXIS_TREADY   =>  M_AXIS_TREADY                                    
             );
 
@@ -309,10 +369,10 @@ begin
                 OUT_FULL        =>  out_full                                        ,
                 OUT_AWFULL      =>  out_awfull                                      ,
 
-                M_AXIS_TDATA    =>  M_AXIS_TDATA                                    ,
-                M_AXIS_TKEEP    =>  M_AXIS_TKEEP                                    ,
-                M_AXIS_TVALID   =>  M_AXIS_TVALID                                   ,
-                M_AXIS_TLAST    =>  M_AXIS_TLAST                                    ,
+                M_AXIS_TDATA    =>  m_axis_tdata_sig                                ,
+                M_AXIS_TKEEP    =>  m_axis_tkeep_sig                                ,
+                M_AXIS_TVALID   =>  m_axis_tvalid_sig                               ,
+                M_AXIS_TLAST    =>  m_axis_tlast_sig                                ,
                 M_AXIS_TREADY   =>  M_AXIS_TREADY                                    
             );
 
@@ -372,10 +432,8 @@ begin
 
 
     -- Data vector presented as array of 8-bit counters
-    GEN_SIMPLE_COUNTER_OFF : if SIMPLE_COUNTER = false generate
+    GEN_BYTE_COUNTER : if MODE = "BYTE" generate
 
-
-        GEN_NO_ZEROS : if FILL_ZEROS = false generate
             gen_vector_cnt : for i in 0 to N_BYTES-1 generate 
 
                 cnt_vector_processing : process(CLK)
@@ -399,19 +457,11 @@ begin
                 end process;
             end generate;
 
-        end generate;
-
-        GEN_ZEROS : if FILL_ZEROS = true generate 
-            cnt_vector <= (others => '0');
-        end generate;
-    
     end generate;
 
-
     -- Data word presented as simple counter, which width presented as (N_BYTES*8 downto 0) bits
-    GEN_SIMPLE_COUNTER_ON : if SIMPLE_COUNTER = true generate
+    GEN_SIGNLE_COUNTER : if MODE = "SINGLE" generate
 
-        GEN_NO_ZEROS : if FILL_ZEROS = false generate
             cnt_vector_processing : process(CLK)
             begin
                 if CLK'event AND CLK = '1' then 
@@ -434,15 +484,11 @@ begin
                 end if;
             end process;
 
-        end generate;
-
-        GEN_ZEROS : if FILL_ZEROS = true generate 
-            cnt_vector <= (others => '0');
-        end generate;
-
-
     end generate;
 
+    GEN_ZEROS_COUNTER : if MODE = "ZEROS" generate 
+        cnt_vector <= (others => '0');
+    end generate;
 
 
 end axis_dump_gen_arch;
