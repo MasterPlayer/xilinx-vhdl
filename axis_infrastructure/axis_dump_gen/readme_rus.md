@@ -77,4 +77,4 @@
 - Добавлен testbench-файл для возможности запустить и протестировать компонент. 
 - Обновление описания.
 
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png
