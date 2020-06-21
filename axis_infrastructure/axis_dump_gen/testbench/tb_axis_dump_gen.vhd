@@ -141,7 +141,7 @@ begin
             if i < 10000 then 
                 WORD_LIMIT <= x"00000010";
             else
-                WORD_LIMIT <= x"00000001";
+                WORD_LIMIT <= x"00000000";
             end if;
         end if;
     end process;

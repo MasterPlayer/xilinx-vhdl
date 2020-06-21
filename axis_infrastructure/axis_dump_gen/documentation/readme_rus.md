@@ -78,4 +78,7 @@
 - Добавлен testbench-файл для возможности запустить и протестировать компонент. 
 - Обновление описания.
 
+**6. 21.06.2020 v1.4 - изменения в работе компонента**
+- Скорректированы счетчики `WORD_LIMIT`, `PAUSE`
+
 [logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png

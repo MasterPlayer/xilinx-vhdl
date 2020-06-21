@@ -78,4 +78,7 @@ where `SPEED` - speed in bit per second
 - add testbench file for testing component rapidly
 - update description
 
+**6. 21.06.2020 v1.4 - changes on generator**
+- corrected counters for `pause`, for `word_limit`
+
 [logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png
