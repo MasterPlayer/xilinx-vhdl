@@ -71,7 +71,7 @@ where `SPEED` - speed in bit per second
 2) not recommended transit from big size packets to smaller size packets
 3) WORD_LIMIT and PAUSE must be set less by one from actual packet_size and pause_size respectively. For example : for generate 8192 bytes packets if N_BYTES = 8, we need set generator WORD_LIMIT as 0x000003FFh(1023 in decimal)
 
-**5. **18.06.2020 v1.3 - changes on generator**
+**5. 18.06.2020 v1.3 - changes on generator**
 - add support for PAUSE = 0
 - Add support for reduce packet size in some moment
 - Changes of generic : all three modes select with one generic parameter `MODE`, not two.
