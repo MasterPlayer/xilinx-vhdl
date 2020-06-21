@@ -76,4 +76,4 @@ Current speed of generator (if TREADY always is set '1') following next rule :
 - add testbench file for testing component rapidly
 - update description
 
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png
