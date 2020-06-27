@@ -16,12 +16,12 @@ end tb_axis_collector;
 
 architecture tb_axis_collector_arch of tb_axis_collector is
 
-    constant  N_CHANNELS            :           integer                          := 32              ; -- Number of channels which do segmentation of RAM 
-    constant  N_CHANNELS_W          :           integer                          := 5               ; -- Channel width ( must be > log2(N_CHANNELS))
-    constant  TUSER_WIDTH           :           integer                          := 3               ;
-    constant  SEGMENT_BYTE_SIZE     :           integer                          := 32              ; -- Size of each segment for holding data from each received channel
-    constant  N_BYTES_IN            :           integer                          := 4               ; -- Input width in bytes
-    constant  N_BYTES_OUT           :           integer                          := 8               ; -- output width in bytes, can be assymetric
+    constant  N_CHANNELS            :           integer                          := 2               ; -- Number of channels which do segmentation of RAM 
+    constant  N_CHANNELS_W          :           integer                          := 1               ; -- Channel width ( must be > log2(N_CHANNELS))
+    constant  TUSER_WIDTH           :           integer                          := 1               ;
+    constant  SEGMENT_BYTE_SIZE     :           integer                          := 2               ; -- Size of each segment for holding data from each received channel
+    constant  N_BYTES_IN            :           integer                          := 1               ; -- Input width in bytes
+    constant  N_BYTES_OUT           :           integer                          := 1               ; -- output width in bytes, can be assymetric
     constant  ASYNC_MODE            :           boolean                          := true            ; -- use asyncronous mode
     constant  SEGMENT_MAX_PKTS      :           integer                          := 1               ; -- Number of packets in each segment. 
     constant  ADDR_USE              :           string                           := "full"          ; -- Address part using "full" or "high" 
@@ -206,7 +206,7 @@ begin
     WORD_LIMIT_processing : process(S_AXIS_CLK)
     begin
         if S_AXIS_CLK'event AND S_AXIS_CLK = '1' then 
-            WORD_LIMIT <= x"00000008";
+            WORD_LIMIT <= x"00000001";
         end if;
     end process;
 

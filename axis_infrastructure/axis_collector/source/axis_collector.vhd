@@ -51,7 +51,7 @@ architecture axis_collector_arch of axis_collector is
     ATTRIBUTE X_INTERFACE_PARAMETER of M_AXIS_RESET: SIGNAL is "POLARITY ACTIVE_HIGH";
 
 
-    constant VERSION            :           string  := "1.1";
+    constant VERSION            :           string  := "1.2";
 
     constant WORDA_WIDTH        :           integer :=  N_BYTES_IN*8;
     constant WORDB_WIDTH        :           integer :=  N_BYTES_OUT*8;
@@ -293,7 +293,6 @@ begin
     end generate;
 
 
-
     dina_processing : process(S_AXIS_CLK)
     begin
         if S_AXIS_CLK'event AND S_AXIS_CLK = '1' then 
@@ -328,44 +327,103 @@ begin
         );
 
     GEN_ASYNC : if ASYNC_MODE = true generate
-        fifo_cmd_async_xpm_inst : fifo_cmd_async_xpm 
-            generic map (
-                DATA_WIDTH      =>  HI_ADDRA                                                ,
-                CDC_SYNC        =>  5                                                       ,
-                MEMTYPE         =>  "distributed"                                           ,
-                DEPTH           =>  FIFO_DEPTH                                              
-            )
-            port map (
-                CLK_WR          =>  S_AXIS_CLK                                              ,
-                RESET_WR        =>  S_AXIS_RESET                                            ,
-                CLK_RD          =>  M_AXIS_CLK                                              ,
-                DIN             =>  fifo_cmd_din                                            ,
-                WREN            =>  fifo_cmd_wren                                           ,
-                FULL            =>  fifo_cmd_full                                           ,
-                DOUT            =>  fifo_cmd_dout                                           ,
-                RDEN            =>  fifo_cmd_rden                                           ,
-                EMPTY           =>  fifo_cmd_empty                                           
-            );
+
+        FIFO_MIN_DEPTH_EXTEND_GEN : if FIFO_DEPTH < 16 generate 
+
+            fifo_cmd_async_xpm_inst : fifo_cmd_async_xpm 
+                generic map (
+                    DATA_WIDTH      =>  HI_ADDRA                                                ,
+                    CDC_SYNC        =>  4                                                       ,
+                    MEMTYPE         =>  "distributed"                                           ,
+                    DEPTH           =>  16                                                       
+                )
+                port map (
+                    CLK_WR          =>  S_AXIS_CLK                                              ,
+                    RESET_WR        =>  S_AXIS_RESET                                            ,
+                    CLK_RD          =>  M_AXIS_CLK                                              ,
+                    DIN             =>  fifo_cmd_din                                            ,
+                    WREN            =>  fifo_cmd_wren                                           ,
+                    FULL            =>  fifo_cmd_full                                           ,
+                    DOUT            =>  fifo_cmd_dout                                           ,
+                    RDEN            =>  fifo_cmd_rden                                           ,
+                    EMPTY           =>  fifo_cmd_empty                                           
+                );
+
+        end generate;
+
+
+        FIFO_DEPTH_NORMAL : if FIFO_DEPTH >= 16 generate 
+
+            fifo_cmd_async_xpm_inst : fifo_cmd_async_xpm 
+                generic map (
+                    DATA_WIDTH      =>  HI_ADDRA                                                ,
+                    CDC_SYNC        =>  5                                                       ,
+                    MEMTYPE         =>  "distributed"                                           ,
+                    DEPTH           =>  FIFO_DEPTH                                               
+                )
+                port map (
+                    CLK_WR          =>  S_AXIS_CLK                                              ,
+                    RESET_WR        =>  S_AXIS_RESET                                            ,
+                    CLK_RD          =>  M_AXIS_CLK                                              ,
+                    DIN             =>  fifo_cmd_din                                            ,
+                    WREN            =>  fifo_cmd_wren                                           ,
+                    FULL            =>  fifo_cmd_full                                           ,
+                    DOUT            =>  fifo_cmd_dout                                           ,
+                    RDEN            =>  fifo_cmd_rden                                           ,
+                    EMPTY           =>  fifo_cmd_empty                                           
+                );
+
+        end generate;
+
+
+
     end generate;
 
 
     GEN_SYNC : if ASYNC_MODE = false generate
-        fifo_cmd_sync_xpm_inst : fifo_cmd_sync_xpm
-            generic map (
-                DATA_WIDTH      =>  HI_ADDRA                                                ,
-                MEMTYPE         =>  "distributed"                                           ,
-                DEPTH           =>  FIFO_DEPTH                                              
-            )
-            port map (
-                CLK             =>  S_AXIS_CLK                                              ,
-                RESET           =>  S_AXIS_RESET                                            ,
-                DIN             =>  fifo_cmd_din                                            ,
-                WREN            =>  fifo_cmd_wren                                           ,
-                FULL            =>  fifo_cmd_full                                           ,
-                DOUT            =>  fifo_cmd_dout                                           ,
-                RDEN            =>  fifo_cmd_rden                                           ,
-                EMPTY           =>  fifo_cmd_empty                                           
-            );
+
+        FIFO_MIN_DEPTH_EXTEND_GEN : if FIFO_DEPTH < 16 generate 
+
+            fifo_cmd_sync_xpm_inst : fifo_cmd_sync_xpm
+                generic map (
+                    DATA_WIDTH      =>  HI_ADDRA                                                ,
+                    MEMTYPE         =>  "distributed"                                           ,
+                    DEPTH           =>  16                                              
+                )
+                port map (
+                    CLK             =>  S_AXIS_CLK                                              ,
+                    RESET           =>  S_AXIS_RESET                                            ,
+                    DIN             =>  fifo_cmd_din                                            ,
+                    WREN            =>  fifo_cmd_wren                                           ,
+                    FULL            =>  fifo_cmd_full                                           ,
+                    DOUT            =>  fifo_cmd_dout                                           ,
+                    RDEN            =>  fifo_cmd_rden                                           ,
+                    EMPTY           =>  fifo_cmd_empty                                           
+                );
+
+        end generate;
+
+        FIFO_DEPTH_NORMAL : if FIFO_DEPTH >= 16 generate 
+
+            fifo_cmd_sync_xpm_inst : fifo_cmd_sync_xpm
+                generic map (
+                    DATA_WIDTH      =>  HI_ADDRA                                                ,
+                    MEMTYPE         =>  "distributed"                                           ,
+                    DEPTH           =>  FIFO_DEPTH                                              
+                )
+                port map (
+                    CLK             =>  S_AXIS_CLK                                              ,
+                    RESET           =>  S_AXIS_RESET                                            ,
+                    DIN             =>  fifo_cmd_din                                            ,
+                    WREN            =>  fifo_cmd_wren                                           ,
+                    FULL            =>  fifo_cmd_full                                           ,
+                    DOUT            =>  fifo_cmd_dout                                           ,
+                    RDEN            =>  fifo_cmd_rden                                           ,
+                    EMPTY           =>  fifo_cmd_empty                                           
+                );
+
+        end generate;
+
     end generate;
 
 
