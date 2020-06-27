@@ -66,4 +66,4 @@ where
 - supports axi_stream bus
 - allow configure stream speed
 
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_checker/documentation/axis_checker.png
+[logo]: /axis_checker.png
