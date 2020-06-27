@@ -3,7 +3,7 @@
 Simple data generator for AXI-Stream bus with ability for configuration data bus and work in CDC mode
 
 ## Structure
-[axis_dump_gen scheme][logo]
+![axis_dump_gen scheme](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png)
 
 ## Generic-parameters
 1) `N_BYTES` - data bus width with 8 bit multiplicity
