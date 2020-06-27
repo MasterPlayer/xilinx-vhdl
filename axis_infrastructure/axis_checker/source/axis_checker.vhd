@@ -6,18 +6,16 @@ library IEEE;
     use ieee.std_logic_unsigned.all;
     use ieee.std_logic_arith.all;
 
-
-
-entity axis_checker_adv is
+entity axis_checker is
     generic (
         N_BYTES                 :           integer   := 4                                  ;
         TIMER_LIMIT             :           integer   := 156250000                          ;
-        FRAMING_MODE            :           boolean   := true                               ;
         MODE                    :           string    := "SINGLE"  -- "ZEROS" "BYTE"
     );
     port(
         CLK                     :   in      std_logic                                       ;
         RESET                   :   in      std_logic                                       ;
+        
         S_AXIS_TDATA            :   in      std_logic_vector ( (N_BYTES*8)-1 downto 0 )     ;
         S_AXIS_TKEEP            :   in      std_logic_vector ( N_BYTES-1 downto 0 )         ;
         S_AXIS_TVALID           :   in      std_logic                                       ;
@@ -37,23 +35,23 @@ entity axis_checker_adv is
         HAS_PACKET_ERR          :   out     std_logic                                       ;
         HAS_DATA_ERR            :   out     std_logic                           
     );
-end axis_checker_adv;
+end axis_checker;
 
 
 
-architecture axis_checker_adv_arch of axis_checker_adv is
+architecture axis_checker_arch of axis_checker is
 
     constant DATA_WIDTH         :           integer := (N_BYTES*8);
 
     -- счетчик по которому будут сравниваться значения по ошибке. Настраивается по функции MODE
     signal  cnt_fill            :           std_logic_vector ( DATA_WIDTH-1 downto 0 )  := (others => '0')      ;
 
-    signal  has_data_err_reg    :           std_logic                                   := '0'                  ;
+    signal  has_data_err_reg    :           std_logic                           := '0'                  ;
 
     -- Готовность блока к приему данных - конфигуратор READY сигналов
-    signal  ready_1_cnt         :           std_logic_vector ( 31 downto 0 ) := (others => '0')                  ;
-    signal  ready_0_cnt         :           std_logic_vector ( 31 downto 0 ) := (others => '0')                  ;
-    signal  s_axis_tready_reg   :           std_logic                                   := '0'                  ;
+    signal  ready_1_cnt         :           std_logic_vector ( 31 downto 0 )    := (others => '0')                  ;
+    signal  ready_0_cnt         :           std_logic_vector ( 31 downto 0 )    := (others => '0')                  ;
+    signal  s_axis_tready_reg   :           std_logic                           := '0'                  ;
 
     type fsm is(
         IDLE_ST             ,
@@ -61,24 +59,24 @@ architecture axis_checker_adv_arch of axis_checker_adv is
         CHk_NOT_RDY_ST    
     );
 
-    signal  current_state : fsm := IDLE_ST;
+    signal  current_state       :           fsm                                 := IDLE_ST;
 
-    signal  save_for_first : std_logic := '1';
+    signal  save_for_first      :           std_logic                           := '1';
 
-    signal  data_error_reg      :           std_logic_vector ( 31 downto 0 ) := (others => '0')                 ;
-    signal  packet_error_reg    :           std_logic_vector ( 31 downto 0 ) := (others => '0')                 ;
+    signal  data_error_reg      :           std_logic_vector ( 31 downto 0 )    := (others => '0')                 ;
+    signal  packet_error_reg    :           std_logic_vector ( 31 downto 0 )    := (others => '0')                 ;
     
-    signal  timer_cnt           :           std_logic_Vector ( 31 downto 0 ) := (others => '0')                 ;
+    signal  timer_cnt           :           std_logic_Vector ( 31 downto 0 )    := (others => '0')                  ;
 
-    signal  data_speed_reg      :           std_logic_vector ( 31 downto 0 ) := (others => '0')                 ;
-    signal  data_speed_cnt      :           std_logic_vector ( 31 downto 0 ) := (others => '0')                 ;
+    signal  data_speed_reg      :           std_logic_vector ( 31 downto 0 )    := (others => '0')                  ;
+    signal  data_speed_cnt      :           std_logic_vector ( 31 downto 0 )    := (others => '0')                  ;
 
-    signal  packet_speed_reg    :           std_logic_vector ( 31 downto 0 ) := (others => '0')                 ;
-    signal  packet_speed_cnt    :           std_logic_vector ( 31 downto 0 ) := (others => '0')                 ;
+    signal  packet_speed_reg    :           std_logic_vector ( 31 downto 0 )    := (others => '0')                  ;
+    signal  packet_speed_cnt    :           std_logic_vector ( 31 downto 0 )    := (others => '0')                  ;
 
-    signal  has_packet_err_reg  :           std_logic                        := '0'                             ;
-    signal  packet_size_cnt     :           std_logic_vector ( 31 downto 0 ) := (others => '0')                 ;        
-
+    signal  has_packet_err_reg  :           std_logic                           := '0'                              ;
+    signal  packet_size_cnt     :           std_logic_vector ( 31 downto 0 )    := x"00000001"                      ;        
+    signal  packet_size_reg     :           std_logic_vector ( 31 downto 0 )    := (others => '0')                  ;
 begin
 
     S_AXIS_TREADY <= s_axis_tready_reg;
@@ -94,6 +92,23 @@ begin
     PACKET_ERROR    <= packet_error_reg     ;
     HAS_PACKET_ERR  <= has_packet_err_reg   ;
 
+    packet_size_reg_processing : process(CLK)
+    begin
+        if CLK'event AND CLK = '1' then 
+            case current_state is
+                when IDLE_ST =>
+                    if ENABLE = '1' then
+                        packet_size_reg <= PACKET_SIZE;
+                    else
+                        packet_size_reg <= packet_size_reg;
+                    end if;
+
+                when others => 
+                    packet_size_reg <= packet_size_reg;
+
+            end case;
+        end if;
+    end process;
 
     current_state_processing : process(CLK)
     begin
@@ -117,7 +132,11 @@ begin
                             if NOT_READY_LIMIT = 0 then 
                                 current_state <= current_state;
                             else
-                                current_state <= CHk_NOT_RDY_ST;
+                                if ENABLE = '0' then 
+                                    current_state <= IDLE_ST;
+                                else    
+                                    current_state <= CHk_NOT_RDY_ST;
+                                end if;
                             end if;
                         end if;
 
@@ -125,7 +144,11 @@ begin
                         if ready_0_cnt < NOT_READY_LIMIT-1 then 
                             current_state <= current_state;
                         else
-                            current_state <= CHK_IS_READY_ST;
+                            if ENABLE = '0' then 
+                                current_state <= IDLE_ST;
+                            else
+                                current_state <= CHK_IS_READY_ST;
+                            end if;
                         end if;
 
                     when others => 
@@ -450,11 +473,11 @@ begin
     begin
         if CLK'event AND CLK = '1' then 
             if RESET = '1' then 
-                packet_size_cnt <= (others => '0') ;
+                packet_size_cnt <= x"00000001";
             else
                 if S_AXIS_TVALID = '1' and s_axis_tready_reg = '1' then 
                     if S_AXIS_TLAST = '1' then 
-                        packet_size_cnt <= (others => '0');
+                        packet_size_cnt <= x"00000001";
                     else
                         packet_size_cnt <= packet_size_cnt + 1;
                     end if;
@@ -473,10 +496,14 @@ begin
             else
                 if S_AXIS_TVALID = '1' and s_axis_tready_reg = '1' then 
                     if S_AXIS_TLAST = '1' then 
-                        if packet_size_cnt = PACKET_SIZE then 
+                        if packet_size_reg = 0 then 
                             has_packet_err_reg <= '0';
                         else
-                            has_packet_err_reg <= '1';
+                            if packet_size_cnt = packet_size_reg then 
+                                has_packet_err_reg <= '0';
+                            else
+                                has_packet_err_reg <= '1';
+                            end if;
                         end if;
                     else
                         has_packet_err_reg <= '0';
@@ -543,4 +570,4 @@ begin
     end process;
 
 
-end axis_checker_adv_arch;
+end axis_checker_arch;
