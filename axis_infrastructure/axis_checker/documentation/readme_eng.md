@@ -3,7 +3,7 @@
 component for checking data. Works as slave AXI-Stream protocol with ability for configuration data bus
 
 ## Structure 
-[axis_checker scheme][logo]
+![logo](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_checker/documentation/axis_checker.png)
 
 ## generic parameters 
 1) `N_BYTES` - parameter for  configure data bus width
@@ -66,4 +66,3 @@ where
 - supports axi_stream bus
 - allow configure stream speed
 
-[logo](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_checker/documentation/axis_checker.png)

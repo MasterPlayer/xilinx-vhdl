@@ -3,7 +3,7 @@
 Блок проверки значений счетчика. Работает как слейв AXI-Stream c с возможностью конфигурации ширины шины данных
 
 ## Структура
-[axis_checker scheme][logo]
+![logo](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_checker/documentation/axis_checker.png)
 
 ## generic-параметры:
 1) `N_BYTES` - позволяет установить размер шины данных, кратной 1 байту. 
@@ -65,6 +65,3 @@
 - Позволяет принимать три разных паттерна данных
 - Поддержка AXI-Stream
 - Позволяет настраивать скорости потока. 
-
-
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_checker/documentation/axis_checker.png
