@@ -7,6 +7,7 @@
 ## Структура 
 
 ![axis_arb_2_to_1][logo1]
+
 [logo1]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_arb_2_to_1/documentation/axis_arb_2_to_1.png
 
 ## generic-параметры
@@ -28,7 +29,7 @@ S00_AXIS_TDATA | вход | `N_BYTES*8` | порт данных
 S00_AXIS_TKEEP | вход | `N_BYTES` | порт валидности байт внутри слова
 S00_AXIS_TVALID | вход | 1 | сигнал валидности
 S00_AXIS_TREADY | выход | 1 | сигнал готовности к приему данных со стороны компонента
-S00_AXIS_TLAST | вход | сигнал конца пакета
+S00_AXIS_TLAST | вход | 1 | сигнал конца пакета
 
 
 #### Slave AXI Stream 1 
@@ -39,7 +40,7 @@ S00_AXIS_TDATA | вход | `N_BYTES*8` | порт данных
 S00_AXIS_TKEEP | вход | `N_BYTES` | порт валидности байт внутри слова
 S00_AXIS_TVALID | вход | 1 | сигнал валидности
 S00_AXIS_TREADY | выход | 1 | сигнал готовности к приему данных со стороны компонента
-S00_AXIS_TLAST | вход | сигнал конца пакета
+S00_AXIS_TLAST | вход | 1 | сигнал конца пакета
 
 
 #### Master AXI Stream 
@@ -50,7 +51,7 @@ M_AXIS_TDATA | выход | `N_BYTES*8` | порт данных
 M_AXIS_TKEEP | выход | `N_BYTES` | порт валидности байт внутри слова
 M_AXIS_TVALID | выход | 1 | сигнал валидности
 M_AXIS_TREADY | вход | 1 | сигнал готовности к приему данных со стороны устройства, принимающего поток с компонента
-M_AXIS_TLAST | выход | сигнал конца пакета
+M_AXIS_TLAST | выход | 1 | сигнал конца пакета
 
 
 ## Некоторые принципы работы компонента
@@ -61,7 +62,9 @@ M_AXIS_TLAST | выход | сигнал конца пакета
 - Асинхронный режим не поддерживается в текущей реализации. 
 
 Структура конечного автомата представлена на рисунке. 
+
 ![axis_arb_2_to_1_fsm][logo_fsm]
+
 [logo_fsm]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_arb_2_to_1/documentation/axis_arb_2_to_1_fsm.png
 
 
