@@ -1,183 +1,134 @@
 # axis_collector
 
-## DESCRIPTION
-The component is designed to collect, store, transmit data from various channels. Data comes from different channels randomly. The component collects data from various channels, collects them by segments, and transmits only ready-made packets.
+Компонент для сбора, хранения (накопления) и передачи данных с нескольких каналов. Поток представляет собой данные, которые поступают с различных каналов в случайные моменты времени. Компонент коллекционирует эти данные в зависимости от идентификатора канала в сегменты, производит упорядочивание данных, и передает только полностью готовые пакеты.
 
-Component parametrized for some parameters, such as input, output width, number of channels, size of RAM, Sync/Async mode, segment size. 
-Component supports assymetric mode, when input width and output width doesnt match.
+Готовый сегмент вычисляется исходя из формулы:
+
+**SEGMENT_BYTE_SIZE/SEGMENT_MAX_PKTS**
+
+Компонент является параметризуемым по различным параметрам, таким как разрядность входа/выхода, работа в синхронном/асинхронном режиме, количество сегментов и размеры этих сегментов, количество пакетов сколько может храниться в сегменте. 
+
+Компонент поддерживает ассиметричную разрядность, когда вход имеет одну разрядность, а выход - другую. 
+
+## Структура
 
 ![axis collector][logo]
 
-[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/axis_collector.png "Logo Title Text 2"
+[logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/documentation/axis_collector.png "Logo Title Text 2"
+
+## generic-параметры
+
+Компонент содержит несколько параметров чтобы можно было обеспечить гибкую конфигурацию
+
+### список generic
+
+№ | Параметр | тип | ограничения | описание
+--|----------|-----|-------------|---------
+1 | N_CHANNELS | integer | > 1 |количество каналов на которые сегментируется память
+2 | N_CHANNELS_W | integer | >log2(N_CHANNELS) | разрядность шины TID
+3 | SEGMENT_BYTE_SIZE | integer | >0( см.**1**) | размер каждого сегмента, который хранит данные
+4 | N_BYTES_IN | integer | >0 | Входная разрядность шины данных в байтах
+5 | N_BYTES_OUT | integer | >0 | Выходная разрядность шины данных в байтах
+6 | ASYNC_MODE | boolean | true или false |Асинхронный режим. Позволяет производить работу в разных тактовых доменах
+7 | SEGMENT_MAX_PKTS | integer | >0 |Количество пакетов внутри одного сегмента
+8 | ADDR_USE | string | "full" или "high" |параметр формирования адресации
+9 | TUSER_WIDTH | integer | >=1(см.**2**) | разрядность шины TUSER
+
+**1** в зависимости от параметра ADDR_USE используются следующие условия:
+- При `ADDR_USE = high` параметр должен удовлетворять условиям:
+
+SEGMENT_BYTE_SIZE >= N_BYTES_IN 
+SEGMENT_BYTE_SIZE >= N_BYTES_OUT
+
+В противном случае генерация невозможна
+
+- При `ADDR_USE = full` параметр должен удовлетворять условиям:
+
+SEGMENT_BYTE_SIZE >= N_BYTES_IN + ширина TUSER
+SEGMENT_BYTE_SIZE >= N_BYTES_IN + ширина TUSER
+
+Таким образом, при 
+
+`N_BYTES_IN = 1` 
+
+`N_BYTES_OUT = 1`
+
+`TUSER = 1`
+
+`SEGMENT_BYTE_SIZE` не может быть меньше 2
+
+**2** Если используется `ADDR_USE = high`, то размер TUSER не влияет на работу, так как он не учитывается. 
 
 
-## GENERIC:
-1) `N_CHANNELS` - Number of channels which do segmentation of RAM 
-2) `N_CHANNELS_W` - Channel width ( must be >`log2(N_CHANNELS)`)
-3) `SEGMENT_BYTE_SIZE` - Size of each segment for holding data from each received channel
-4) `N_BYTES_IN` - Input width in bytes
-5) `N_BYTES_OUT` - output width in bytes, can be assymetric
-6) `ASYNC_MODE` - use asyncronous mode
-7) `SEGMENT_MAX_PKTS` - Number of packets in each segment. 
-8) `ADDR_USE` - parameter for determine how address was formed. Valid values : 
-- `full` - use `S_AXIS_TID, S_AXIS_TUSER` signals for form address;
-- `high` - use `S_AXIS_TID` signal for address(for high signuficant bit). `S_AXIS_TUSER` was ignored and has no effect
-9) `TUSER_WIDTH` - width of S_AXIS_TUSER signal in bits
+## Порты
 
-## PORTS:
-### Inputs :
-1) `S_AXIS_TDATA` – input data bus. Width parametrized in next equation:
+### AXI-Stream 
 
-`N_BYTES_IN * 8`
+**Внимание**
+> Компонент имеет возможность работать по разным тактовым доменам между S_AXIS и M_AXIS шинами, в том числа и для внутренней логики. В случае, если `ASYNC_MODE = false`, порты `S_AXIS_CLK` и `M_AXIS_CLK` подключаются к одному и тому же тактовому сигналу, а сигналы `S_AXIS_RESET` и `M_AXIS_RESET` - к одному и тому же сигналу сброса. 
 
-2) `S_AXIS_TID` – input bus for indentification segment. Width parametrized in next equation: 
+#### Slave AXI-Stream 
+Название | направление |Разрядность | Назначение
+---------|-------------|------------|-----------
+S_AXIS_CLK | вход | 1 | сигнал тактирования S_AXIS-инфраструктуры
+S_AXIS_RESET | вход | 1 | сигнал сброса логики S_AXIS-инфраструктуры
+S_AXIS_TDATA | вход | N_BYTES_IN*8 | сигнал входных данных
+S_AXIS_TID | вход | N_CHANNELS | сигнал номера канала для идентификации сегмента куда складывать пакет
+S_AXIS_TUSER | вход | TUSER_WIDTH | сигнал для упорядочивания данных внутри одного сегмента. Участвует в адресации в качестве младшего разряда. При `ADDR_USE = high` не используется. 
+S_AXIS_TVALID| вход | 1 | сигнал валидности данных на шине
 
-`N_CHANNELS_W`
+#### Master AXI-Stream
+Название | направление | Разрядность | Назначение
+---------|-------------|-------------|-----------
+S_AXIS_CLK | вход | 1 | сигнал тактирования M_AXIS-инфраструктуры
+S_AXIS_RESET | вход | 1 | сигнал сброса логики M_AXIS-инфраструктуры
+M_AXIS_TDATA | выход | N_BYTES_OUT*8 | сигнал выходных данных
+M_AXIS_TID | выход | N_CHANNELS | сигнал номер канала для идентификации. Необходим для того, чтобы имелась возможность коммутации
+M_AXIS_TVALID | выход | 1 | сигнал валидности данных 
+M_AXIS_TREADY | вход | 1 | сигнал готовности приемника
 
-3) `S_AXIS_TVALID` – input signal for signaling for valid data.
+## Некоторые принципы работы компонента
+- Компонент коллекционирует поступающий поток, разбивает его на сегменты и производит запись во внутреннюю память в зависимости от номера сегмента. Номер сегмента определяется сигналом `S_AXIS_TID`.
+- Компонент умеет работать только по словам, поддержка байт внутри одного слова не обеспечивается (`TKEEP`-сигнал отсутствует)
+- Компонент рассчитан на работу, при которой несколько низкоскоростных потоков данных поступают на его вход, а компонент уже занимается тем, что производит разделение и упорядочивание данных внутри одного пакета. `TREADY` не поддерживается со стороны Slave AXI-Stream.
+- Под одним низкоскоростным потоком понимается такой поток, у которого какой-то определенный TID. 
+- При использовании `ADDR_USE = "full"` в формировании адреса участвует `TUSER`-сигнал, разрядность которого конфигурируема. Необходимость в использовании `TUSER` возникла потому что данные, которые поступали на вход, мешались внутри одного пакета. 
+- Если Master AXI-Stream будет работать медленнее чем входной поток данных, то может происходить перезапись данных с потерей части уже записанных данных внутри памяти. Это происходит так как Slave AXI-Stream не поддерживает сигнал `TREADY`.
+- На практике `TID` обозначал номер канала узкополосного сигнала, а `TUSER` - номер АЦП. При этом после фильтрации номера АЦП меняли свой порядок, а надо было сохранить поток в том формате и в том порядке, который был до фильтрации. 
+- При использовании `ADDR_USE = "high"` адрес к памяти формируется только на основе внутреннего счетчика адреса и `TID` для адресации сегмента. `TUSER` при этом не используется. 
+- Пакет выдается на Master AXI-Stream без `TLAST` сигнала, но с номером канала.  
+- Размер пакета должен быть кратен `N_BYTES_IN` и `N_BYTES_OUT`. Работа, при которой входная шина данных имеет разрядность 24 бит, а выходная - 16 бит не гарантируется и не проверялась. 
 
-_S_AXIS_TREADY isn’t presented. Overflow data overwrite current holded data_
-
-4) `S_AXIS_TUSER` - input signal which using for low part of address in RAM memory port A. This signal using only when `ADDR_USE = 'full'`. This signal used for addressation inside segment
-
-### Outputs :
-1) `M_AXIS_TDATA` - output data bus. Width parametrized in equation : 
-
-`N_BYTES_OUT * 8`
-
-2) `M_AXIS_TID` - output bus with identification segment. Width parametrized with
-
-`N_CHANNELS_W`
-
-3) `M_AXIS_TVALID` - output signal for valid data on bus
-4) `M_AXIS_TREADY` - input signal for signaling ready of destination component
-
-
-## CONSTANTS: 
-
-Next parameters calculated for parametrized registers/buses/components. 
-
-1) `WORDA_WIDTH = N_BYTES_IN*8`
-
-_This parameter needed for calculating input word width for memory (RAM)_
-
-2) `WORDB_WIDTH = N_BYTES_OUT*8`
-
-_This parameter needed for calculating output word width for memory (RAM)_
-
-3) `ADDRA_WIDTH = log2((SEGMENT_BYTE_SIZE*N_CHANNELS)/N_BYTES_IN)`
-
-_This parameter needed for calculating address bus for PORT A in memory_
-**Example 1**
-* SEGMENT_BYTE_SIZE = 2048
-* N_CHANNELS = 32
-* N_BYTES_IN = 4
-* All memory size for all segments in bytes : 2048 * 32 = 65536 bytes;
-* Number of words for all memory : 65536/4 = 16384;
-* **Address bus for all memory(ADDRA_WIDTH) : log2(16384) = 14**
-4) `ADDRB_WIDTH = log2((SEGMENT_BYTE_SIZE*N_CHANNELS)/N_BYTES_OUT)`
-
-_This parameter needed for calculating address bus for PORT B in memory_
-
-**Example 1:**
-* SEGMENT_BYTE_SIZE = 2048
-* N_CHANNELS = 32
-* N_BYTES_OUT = 32
-* All memory size for all segments in bytes: 2048 * 32 = 65536 bytes;
-* Number of words for all memory : 65536/32 = 2048;
-* **Address bus for all memory(ADDRB_WIDTH) : log2(2048) = 11**
-5) `SEG_CNT_WIDTH = log2(SEGMENT_BYTE_SIZE/N_BYTES_IN)`
-
-_width for register, which intended for segment addressation_
-
-**Example 1:**
-* SEGMENT_BYTE_SIZE = 1024
-* N_BYTES_IN = 4
-* Number of words in segment : 1024 / 4 = 256
-* **Segment address counter width = log2(256) = 8**
-
-6) `SEG_PART_LIMIT = SEG_CNT_WIDTH - log2(SEGMENT_MAX_PKTS)`
-
-_cnt limit for packet which holded in one segment_
-
-**Example 1:**
-* SEG_CNT_WIDTH = 8;
-* SEGMENT_MAX_PKTS = 2
-* **SEG_PART_LIMIT = 8 - log2(2) = 7**
-
-7) `DIFF_CNT_PART = SEG_CNT_WIDTH - SEG_PART_LIMIT`
-
-_the number of bits in the segment counter, which is designed to signal the finished packet_
-
-8) `ALL_ONES = width calculated as SEG_PART_LIMIT`
-
-_register for hold all '1' for compare with segment address counter for signal the finished packets_
-
-9) `HI_ADDRA = ADDRA_WIDTH - SEG_PART_LIMIT`
-
-_width of register which intended for transmission to read part_
-
-10) `BYTES_PER_PKT = SEGMENT_BYTE_SIZE/SEGMENT_MAX_PKTS`
-
-_number of bytes in packet in segment. Needed for read interface(for counter CNTB)_
-
-11) `CNTB_LIMIT = BYTES_PER_PKT/N_BYTES_OUT`
-
-_Limit of counting for CNTB register, which intended for read one packet from memory_
-
-12) `CNTB_WIDTH = log2(CNTB_LIMIT)`
-
-_Width of CNTB register_
-
-13) `CNTB_LIMIT_VECTOR = width calculated as CNTB_WIDTH`
-
-_register for hold all '1' for compare with segment address counter for finished packets on read interface of memory_
-
-14) `CMD_FIFO_WIDTH = ADDRA_WIDTH - HI_ADDRA`
-
-_width for cmd fifo which intended for transmission from write to read part_
-
-15) `FIFO_DEPTH = SEGMENT_MAX_PKTS * N_CHANNELS`
-
-_Depth for CMD fifo. calculated based on the number of channels and packets in one segment_
-
-16) `CNTA_PART = ADDRA_WIDTH - (S_AXIS_TID'length + S_AXIS_TUSER'length)`
-
-_Number of bits, which used for ADDRA register forming for addressation on RAM memory, portA. A Value of this bits used for determine which high part of bits in array of segment counters is used to form ADDRA_
-
-
-## REGISTERS : 
-1) `wea` - write enable for memory 
-2) `addra` - address bus for PORTA
+Структура формирования адреса для записи (`ADDRA`) и чтения (`ADDRB`) для различных режимов представлена на рисунке:
 
 ![addra structure][logo1]
-
-3) `dina` - data register 
-4) `addrb` - address bus for PORTB
-
 ![addrb structure][logo2]
 
-5) `doutb` - data output from memory PORTB
-6) `addra_vector` - array of counters for addressation in each segment of memory(when used `ADDR_USE = "high"`). For `ADDR_USE = "full"` this register count for input words, and used for determine where to write current packet.
+[logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/documentation/addra_reg.png "Logo Title Text 2"
 
-![addra_vector structure][logo3]
+[logo2]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/documentation/addrb_reg.png "Logo Title Text 2"
 
-7) `event_compl_vector` - register for indicating event of finished packet in segment
-8) `cntb` - counter for segment for PORTB of RAM
+## Необходимые внешние компоненты:
 
-FINITE STATE MACHINE: 
-![fsm structure][logo4]
+Название компонента | Описание
+--------------------|---------
+[sdpram_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/ram_parametrized/sdpram_xpm/sdpram_xpm.vhd) | примитив памяти для хранения данных
+[fifo_cmd_async_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_cmd_async_xpm/fifo_cmd_async_xpm.vhd) | примитив очереди для хранения запросов готовых пакетов на отправку при `ASYNC_MODE = "true"`
+[fifo_cmd_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_cmd_sync_xpm/fifo_cmd_sync_xpm.vhd) | примитив очереди для хранения запросов готовых пакетов на отправку при `ASYNC_MODE = "false"`
+[fifo_out_sync_xpm_id](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_sync_xpm_id/fifo_out_sync_xpm_id.vhd) | примитив очереди для данных на отправку для реализации Master AXI-Stream
+[axis_dump_gen](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_dump_gen) | необходим для симуляции. 
 
+## Лог изменений
 
+**1. 18.08.2019 v1.0 - первая версия**
 
-## CHANGE LOG 
-* v1.0 - first release
-* v1.1 - add `S_AXIS_TUSER` signal for address. This signal impact only when `ADDR_USE = full` attribute established
+**2. 27.08.2019 v1.1 - Изменения в работе компонента**
+- Добавлена поддержка TUSER
+- Добавлена возможность выбора формирования адреса (`ADDR_USE`)
+1) "full" - адрес формируется с использованием TUSER-сигнала
+2) "high" - адрес формируется без использования TUSER-сигнала 
 
-[logo1]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_reg.png "Logo Title Text 2"
-
-[logo2]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addrb_reg.png "Logo Title Text 2"
-
-[logo3]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/addra_vector_organization.png "Logo Title Text 2"
-
-[logo4]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_collector/fsm.png "Logo Title Text 2"
+**3. 28.06.2020 v1.2 - Изменения в работе компонента**
+- Добавлена поддержка проверки условий при генерации памяти/очередей. 
+- Изменена структура каталога
+- Обновлено описание компонента
