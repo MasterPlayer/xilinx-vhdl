@@ -6,7 +6,7 @@ Include some modules, description, testbench files for components, which work wi
 № | Name | Description 
 --|------|------------
 1 | [axis_dump_gen](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_dump_gen) | data generator with Master AXI-Stream interface for output data 
-2 | [axis_checker](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_dump_gen) | checking unit for input stream with Slave AXI-Stream interface for input stream
+2 | [axis_checker](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_checker) | checking unit for input stream with Slave AXI-Stream interface for input stream
 3 | [axis_collector](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_collector) | component for accumulate, hold, ordering and transmission data. 
 
 ## fifo_parametrized 
