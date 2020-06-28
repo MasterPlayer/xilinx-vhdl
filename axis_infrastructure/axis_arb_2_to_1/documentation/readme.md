@@ -77,8 +77,8 @@ CH0_CHECK | CH0_TX | `S00_AXIS_TVALID = 1`
 CH0_CHECK | CH1_CHECK | `S00_AXIS_TVALID = 0`
 CH1_CHECK | CH1_TX | `S01_AXIS_TVALID = 1`
 CH1_CHECK | CH0_CHECK | `S01_AXIS_TVALID = 0`
-CH0_TX | CH1_CHECK | `out_awfull = 0` and S00_AXIS_TVALID = 1 and S00_AXIS_TLAST = 1
-CH1_TX | CH0_CHECK | `out_awfull = 0` and S01_AXIS_TVALID = 1 and S01_AXIS_TLAST = 1
+CH0_TX | CH1_CHECK | `out_awfull = 0 and S00_AXIS_TVALID = 1 and S00_AXIS_TLAST = 1`
+CH1_TX | CH0_CHECK | `out_awfull = 0 and S01_AXIS_TVALID = 1 and S01_AXIS_TLAST = 1`
 
 
 ## Необходимые внешние компоненты:
