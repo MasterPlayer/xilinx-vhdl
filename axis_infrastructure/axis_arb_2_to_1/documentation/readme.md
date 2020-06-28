@@ -61,11 +61,24 @@ M_AXIS_TLAST | выход | 1 | сигнал конца пакета
 - Для простоты организации компонента не происходит передачи никаких дополнительных полей. То есть на выходной шине отсутствует возможность оценки с какого конкретного порта приходят данные. 
 - Асинхронный режим не поддерживается в текущей реализации. 
 
+## Конечный автомат 
+
+### Граф-схема автомата
 Структура конечного автомата представлена на рисунке. 
 
 ![axis_arb_2_to_1_fsm][logo_fsm]
 
 [logo_fsm]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_arb_2_to_1/documentation/axis_arb_2_to_1_fsm.png
+
+### Состояния 
+текущее состояние | следующее состояние | условие перехода 
+-------------------|---------------------|-----------------
+CH0_CHECK | CH0_TX | `S00_AXIS_TVALID = 1`
+CH0_CHECK | CH1_CHECK | `S00_AXIS_TVALID = 0`
+CH1_CHECK | CH1_TX | `S01_AXIS_TVALID = 1`
+CH1_CHECK | CH0_CHECK | `S01_AXIS_TVALID = 0`
+CH0_TX | CH1_CHECK | `out_awfull = 0` and S00_AXIS_TVALID = 1 and S00_AXIS_TLAST = 1
+CH1_TX | CH0_CHECK | `out_awfull = 0` and S01_AXIS_TVALID = 1 and S01_AXIS_TLAST = 1
 
 
 ## Необходимые внешние компоненты:
