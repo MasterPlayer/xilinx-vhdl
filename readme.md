@@ -1,5 +1,7 @@
 # xilinx-vhdl
 
+-------------
+
 ## axis_infrastructure
 
 Include some modules, description, testbench files for components, which work with AXI-Stream interface
@@ -8,8 +10,9 @@ Include some modules, description, testbench files for components, which work wi
 1 | [axis_dump_gen](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_dump_gen) | data generator with Master AXI-Stream interface for output data 
 2 | [axis_checker](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_checker) | checking unit for input stream with Slave AXI-Stream interface for input stream
 3 | [axis_collector](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_collector) | component for accumulate, hold, ordering and transmission data. 
-4 | [**axis_arb_2_to_1**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_collector) | 2-to-1 AXI-Stream arbiter with equal priority over inputs and ring survey
+4 | [**axis_arb_2_to_1**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_arb_2_to_1) | 2-to-1 AXI-Stream arbiter with equal priority over inputs and ring survey
 
+-------------
 
 ## fifo_parametrized 
 
@@ -22,6 +25,8 @@ Include fifo primitives for instantiate them to other component for flexibility 
 3 | [fifo_out_sync_xpm_id](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_sync_xpm_id/fifo_out_sync_xpm_id.vhd) | Syncronous fifo for realize as Master AXI Stream with support TID field
 4 | [fifo_cmd_async_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_cmd_async_xpm/fifo_cmd_async_xpm.vhd) | Asyncronous fifo for realize command support
 5 | [fifo_cmd_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_cmd_sync_xpm/fifo_cmd_sync_xpm.vhd) | Syncronous fifo for realize command support 
+
+-------------
 
 ## ram_parametrized
 
