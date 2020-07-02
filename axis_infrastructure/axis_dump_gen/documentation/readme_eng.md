@@ -81,4 +81,9 @@ where `SPEED` - speed in bit per second
 **6. 21.06.2020 v1.4 - changes on generator**
 - corrected counters for `pause`, for `word_limit`
 
+**7. 02.07.2020 v1.5 - changes on generator **
+- Corrected exit from `PAUSE_ST` to `IDLE_ST` if `ENABLE = 0` and `PAUSE > 0` 
+- Corrected exit from `TX_ST` в `IDLE_ST` if `ENABLE = 0` and `PAUSE > 0`
+ 
+
 [logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png

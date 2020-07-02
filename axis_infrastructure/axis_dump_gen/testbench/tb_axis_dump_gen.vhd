@@ -65,6 +65,8 @@ architecture tb_axis_dump_gen_arch of tb_axis_dump_gen is
     signal  M_AXIS_TREADY           :           std_logic                                           ;
     signal  M_AXIS_TLAST            :           std_logic                                           ;
 
+    signal  i_rdy                   :           integer                                      := 0                   ;
+
 begin
 
     CLK <= not CLK after CLK_period/2;
@@ -74,6 +76,17 @@ begin
         if CLK'event AND CLK = '1' then 
             i <= i + 1;
         end if;
+    end process;
+
+    i_rdy_processing : process(CLK)
+    begin
+        if CLK'event AND CLK = '1' then 
+            if i_rdy < 16 then 
+                i_rdy <= i_rdy + 1;
+            else
+                i_rdy <= 0;
+            end if;
+        end if; 
     end process;
 
     RESET_processing : process(CLK)
@@ -128,9 +141,9 @@ begin
     begin
         if CLK'event AND CLK = '1' then 
             if i < 5000 then 
-                PAUSE <= x"00000008";
+                PAUSE <= x"00000001";
             else
-                PAUSE <= x"00000000";
+                PAUSE <= x"00000001";
             end if;
         end if;
     end process;
@@ -139,14 +152,14 @@ begin
     begin
         if CLK'event AND CLK = '1' then 
             if i < 10000 then 
-                WORD_LIMIT <= x"00000010";
+                WORD_LIMIT <= x"00000100";
             else
-                WORD_LIMIT <= x"00000000";
+                WORD_LIMIT <= x"00000100";
             end if;
         end if;
     end process;
 
-    M_AXIS_TREADY <= '1';
+    M_AXIS_TREADY <= '1' when i_rdy < 1 else '0';
 
 
 

@@ -38,7 +38,7 @@ end axis_dump_gen;
 
 architecture axis_dump_gen_arch of axis_dump_gen is
     
-    constant VERSION : string := "v1.4";
+    constant VERSION : string := "v1.5";
     
     ATTRIBUTE X_INTERFACE_INFO : STRING;
     ATTRIBUTE X_INTERFACE_INFO of RESET: SIGNAL is "xilinx.com:signal:reset:1.0 RESET RST";
@@ -247,14 +247,18 @@ begin
                         end if;
 
                     when PAUSE_ST =>
-                        if pause_reg = 0 then 
-                            current_state <= TX_ST;
-                        else
-                            if pause_cnt = pause_reg then 
+                        if ENABLE = '1' then 
+                            if pause_reg = 0 then 
                                 current_state <= TX_ST;
                             else
-                                current_state <= current_state;
+                                if pause_cnt = pause_reg then 
+                                    current_state <= TX_ST;
+                                else
+                                    current_state <= current_state;
+                                end if;
                             end if;
+                        else
+                            current_state <= IDLE_ST;    
                         end if;
 
                     when TX_ST =>
@@ -267,7 +271,11 @@ begin
                                         current_state <= IDLE_ST;    
                                     end if;
                                 else
-                                    current_state <= PAUSE_ST;     
+                                    if ENABLE = '1' and WORD_LIMIT /= 0 then 
+                                        current_state <= PAUSE_ST;     
+                                    else
+                                        current_state <= IDLE_ST;    
+                                    end if;
                                 end if; 
                             else
                                 current_state <= current_state;
