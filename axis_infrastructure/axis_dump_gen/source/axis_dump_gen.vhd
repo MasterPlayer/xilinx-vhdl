@@ -1,12 +1,3 @@
--- 26.11.2016 : updated to v1.1 :: Fixed bug for signal tlast : 
---      only when counter arrivals for value 255 words, 
---      tlast signal assert => signal assert when word 
---      counter assigned WORD_LIMIT value
-
--- 18.06.2020:: 
---      WORD_LIMIT used only in idle_st when we transit to other state. For counting current words use word_limit_reg
---      Fixed transition from IDLE to DATA without PAUSE, only when PAUSE = 0 
-
 library IEEE;
     use IEEE.STD_LOGIC_1164.ALL;
     use ieee.std_logic_unsigned.all;
