@@ -159,7 +159,8 @@ begin
         end if;
     end process;
 
-    M_AXIS_TREADY <= '1' when i_rdy < 1 else '0';
+    --M_AXIS_TREADY <= '1' when i_rdy < 1 else '0';
+    M_AXIS_TREADY <= '1';
 
 
 

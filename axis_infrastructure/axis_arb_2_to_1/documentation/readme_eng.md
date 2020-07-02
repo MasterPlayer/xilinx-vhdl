@@ -13,7 +13,7 @@ makes commutation from two inputs Slave AXI-Stream to one Master AXI-Stream with
 
 ## generic parameters
 Name | Type | Value range | Description
----------|-----|-------------------|---------
+-----|------|-------------|------------
 N_BYTES | integer | >0 | width of data bus in bytes
 
 ## Ports 
@@ -25,7 +25,7 @@ All work of component based upon AXI-Stream support
 #### Slave AXI Stream 0
 
 Name | Direction | Width | Description
----------|-------------|-------------|-----------
+-----|-----------|-------|------------
 S00_AXIS_TDATA | input | `N_BYTES*8` | data port
 S00_AXIS_TKEEP | input | `N_BYTES` | valid of byte in data words
 S00_AXIS_TVALID | input | 1 | valid signal
@@ -36,7 +36,7 @@ S00_AXIS_TLAST | input | 1 | end of packet signal
 #### Slave AXI Stream 1 
 
 Name | Direction | Width | Description
----------|-------------|-------------|-----------
+-----|-----------|-------|------------
 S00_AXIS_TDATA | input | `N_BYTES*8` | data port
 S00_AXIS_TKEEP | input | `N_BYTES` | valid of byte in data words
 S00_AXIS_TVALID | input | 1 | valid signal
@@ -47,7 +47,7 @@ S00_AXIS_TLAST | input | 1 | end of packet signal
 #### Master AXI Stream 
 
 Name | Direction | Width | Description
----------|-------------|-------------|-----------
+-----|-----------|-------|------------
 M_AXIS_TDATA | output | `N_BYTES*8` | data port
 M_AXIS_TKEEP | output | `N_BYTES` | valid of byte in data words
 M_AXIS_TVALID | output | 1 | valid signal
@@ -74,7 +74,7 @@ The structure of FSM presented on following picture
 
 ### States 
 Current state | Next State | Transition condition
--------------------|---------------------|-----------------
+--------------|------------|-----------------
 CH0_CHECK | CH0_TX | `S00_AXIS_TVALID = 1`
 CH0_CHECK | CH1_CHECK | `S00_AXIS_TVALID = 0`
 CH1_CHECK | CH1_TX | `S01_AXIS_TVALID = 1`
@@ -83,9 +83,10 @@ CH0_TX | CH1_CHECK | `out_awfull = 0 and S00_AXIS_TVALID = 1 and S00_AXIS_TLAST 
 CH1_TX | CH0_CHECK | `out_awfull = 0 and S01_AXIS_TVALID = 1 and S01_AXIS_TLAST = 1`
 
 
-## Required external components :
+## Required external components
+
 Name | Description
---------------------|---------
+-----|---------
 [fifo_out_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_sync_xpm/fifo_out_sync_xpm.vhd) | the primitive of fifo for data for sending data with support Master AXI Stream 
 [axis_dump_gen](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_dump_gen) | Required for simulation. 
 

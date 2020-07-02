@@ -23,7 +23,7 @@ Component consists of some parameters for flexibility configuration
 
 ### generic list
 
-№ | Параметр | тип | ограничения | описание
+№ | parameter | type | limitations | description
 --|----------|-----|-------------|---------
 1 | N_CHANNELS | integer | > 1 | Number of channels on which the memory is segmented
 2 | N_CHANNELS_W | integer | >log2(N_CHANNELS) | TID port width
