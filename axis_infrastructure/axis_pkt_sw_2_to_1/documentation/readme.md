@@ -91,10 +91,11 @@ TX_1_ST           | CHK_0_ST            | `out_awfull = 0 and in_dout_last_1 = 1
 
 ![axis_pkt_sw_2_to_1_fsm_work][logo_fsm_work]
 
-[logo_fsm]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_2_to_1/documentation/axis_pkt_sw_2_to_1_fsm_work.png
+[logo_fsm_work]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_2_to_1/documentation/axis_pkt_sw_2_to_1_fsm_work.png
 
 ## Необходимые внешние компоненты
 Название компонент | Описание
+-------------------|---------
 [fifo_out_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_sync_xpm/fifo_out_sync_xpm.vhd) | примитив очереди для данных на отправку для реализации Master AXI-Stream
 [fifo_in_pkt_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_pkt_xpm/fifo_in_pkt_xpm.vhd) | Примитив очереди для накопления флагов готовых пакетов
 [fifo_in_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_sync_xpm/fifo_in_sync_xpm.vhd) | Примитив очереди для накопления данных
