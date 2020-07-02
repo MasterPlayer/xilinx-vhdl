@@ -5,9 +5,9 @@
 Производит передачу пакетов с двух портов Slave AXI-Stream в один порт Master AXI-Stream. Входы имеют одинаковый приоритет. Принцип работы компонента основан на попакетной коммутации с накоплением пакета. Компонент получает данные со входа, складывает эти данные во внутреннюю очередь, и когда придет конец этого пакета, то записывает флаг конца пакета в пакетную очередь. Далее конечный автомат видит, что пакетная очередь не пуста, и производит вычитывание очереди данных до конца пакета. В таком случае, передаваться будет пакет, который полностью лежит во внутренней очереди. До тех пор, пока пакет не будет записан во внутреннюю очередь полностью, его передача через Master AXI-Stream не начнется. 
 
 
-![axis_pkt_sw_2_to_1_logo][logo1]
+![axis_pkt_sw_2_to_1_struct][axis_pkt_sw_2_to_1_struct_ref]
 
-[logo1]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_2_to_1/documentation/axis_pkt_sw_2_to_1.png
+[axis_pkt_sw_2_to_1_struct_ref]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_2_to_1/documentation/axis_pkt_sw_2_to_1_struct.png
 
 
 ## generic-параметры
@@ -74,7 +74,8 @@ M_AXIS_TLAST | выход | 1 | сигнал конца пакета
 Структура конечного состояния представлена на рисунке ( условия переходов не показаны )
 
 ![axis_pkt_sw_2_to_1_fsm][logo_fsm]
-[logo_fsm]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_2_to_1_fsm/documentation/axis_pkt_sw_2_to_1_fsm.png
+
+[logo_fsm]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_2_to_1/documentation/axis_pkt_sw_2_to_1_fsm.png
 
 ### Состояния конечного автомата
 Текущее состояние | Следующее состояние | Условие перехода
@@ -89,7 +90,8 @@ TX_1_ST           | CHK_0_ST            | `out_awfull = 0 and in_dout_last_1 = 1
 ### Диаграмма переходов(пример)
 
 ![axis_pkt_sw_2_to_1_fsm_work][logo_fsm_work]
-[logo_fsm]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_2_to_1_fsm_work/documentation/axis_pkt_sw_2_to_1_fsm_work.png
+
+[logo_fsm]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_pkt_sw_2_to_1/documentation/axis_pkt_sw_2_to_1_fsm_work.png
 
 ## Необходимые внешние компоненты
 Название компонент | Описание
