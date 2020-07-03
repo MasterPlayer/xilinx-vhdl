@@ -84,6 +84,8 @@ where `SPEED` - speed in bit per second
 **7. 02.07.2020 v1.5 - changes on generator **
 - Corrected exit from `PAUSE_ST` to `IDLE_ST` if `ENABLE = 0` and `PAUSE > 0` 
 - Corrected exit from `TX_ST` в `IDLE_ST` if `ENABLE = 0` and `PAUSE > 0`
- 
+
+**8. 02.07.2020 v1.6 - changes on generator **
+- Corrected exit from `PAUSE_ST` to `IDLE_ST` if `ENABLE = 0` and `PAUSE > 0`: transition is forbidden
 
 [logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png

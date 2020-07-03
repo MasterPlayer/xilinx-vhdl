@@ -20,9 +20,38 @@ architecture tb_axis_checker_arch of tb_axis_checker is
     
     constant CLK_period : time := 10 ns;
 
-    constant  N_BYTES                 :           integer   := 4                                  ;
+    constant  N_BYTES                 :           integer   := 8                                  ;
     constant  TIMER_LIMIT             :           integer   := 156250000                          ;
     constant  MODE                    :           string    := "SINGLE"                           ;-- "ZEROS" "BYTE;
+
+
+    component axis_dump_gen
+        generic (
+            N_BYTES                 :           integer                         := 2                ;
+            ASYNC                   :           boolean                         := false            ;
+            MODE                    :           string                          := "SINGLE"          -- "SINGLE", "ZEROS", "BYTE"
+        );
+        port(
+            CLK                     :   in      std_logic                                           ;
+            RESET                   :   in      std_logic                                           ;
+            
+            ENABLE                  :   in      std_logic                                           ;
+            PAUSE                   :   in      std_logic_Vector ( 31 downto 0 )                    ;
+            WORD_LIMIT              :   in      std_logic_Vector ( 31 downto 0 )                    ;
+            
+            M_AXIS_CLK              :   in      std_logic                                           ;
+            M_AXIS_TDATA            :   out     std_logic_Vector ( (N_BYTES*8)-1 downto 0 )         ;
+            M_AXIS_TKEEP            :   out     std_logic_Vector ( N_BYTES-1 downto 0 )             ;
+            M_AXIS_TVALID           :   out     std_logic                                           ;
+            M_AXIS_TREADY           :   in      std_logic                                           ;
+            M_AXIS_TLAST            :   out     std_logic                                            
+        );
+    end component;
+
+    signal gen_enable               :           std_logic                                           ;
+    signal gen_pause                :           std_logic_Vector ( 31 downto 0 ) := (others => '0') ;
+    signal gen_word_limit           :           std_logic_Vector ( 31 downto 0 ) := (others => '0') ;
+
 
     component axis_checker
         generic (
@@ -135,27 +164,37 @@ begin
         );
 
     ENABLE <= '1' when i > 1000 else '0';
-    PACKET_SIZE <= x"00000000";
+    PACKET_SIZE <= x"00001000";
 
-    READY_LIMIT <= x"00000000";
-    NOT_READY_LIMIT <= x"000000F0";
+    READY_LIMIT     <= x"00000010";
+    NOT_READY_LIMIT <= x"00000001";
 
-    S_AXIS_processing : process(CLK)
-    begin
-        if CLK'event AND CLK = '1' then 
-            case i is 
-                when 2000 => S_AXIS_TDATA <= x"00000001"; S_AXIS_TKEEP <= x"F"; S_AXIS_TVALID <= '1'; S_AXIS_TLAST <= '1';
-                when 2001 => S_AXIS_TDATA <= x"00000002"; S_AXIS_TKEEP <= x"F"; S_AXIS_TVALID <= '1'; S_AXIS_TLAST <= '1';
-                when 2002 => S_AXIS_TDATA <= x"00000003"; S_AXIS_TKEEP <= x"F"; S_AXIS_TVALID <= '1'; S_AXIS_TLAST <= '1';
-                when 2003 => S_AXIS_TDATA <= x"00000004"; S_AXIS_TKEEP <= x"F"; S_AXIS_TVALID <= '1'; S_AXIS_TLAST <= '1';
-                when 2004 => S_AXIS_TDATA <= x"00000005"; S_AXIS_TKEEP <= x"F"; S_AXIS_TVALID <= '1'; S_AXIS_TLAST <= '1';
-                when 2005 => S_AXIS_TDATA <= x"00000006"; S_AXIS_TKEEP <= x"F"; S_AXIS_TVALID <= '1'; S_AXIS_TLAST <= '1';
-                when 2006 => S_AXIS_TDATA <= x"00000007"; S_AXIS_TKEEP <= x"F"; S_AXIS_TVALID <= '1'; S_AXIS_TLAST <= '1';
-                when 2007 => S_AXIS_TDATA <= x"00000008"; S_AXIS_TKEEP <= x"F"; S_AXIS_TVALID <= '1'; S_AXIS_TLAST <= '1';
 
-                when others => S_AXIS_TDATA <= S_AXIS_TDATA; S_AXIS_TKEEP <= S_AXIS_TKEEP; S_AXIS_TVALID <= '0'; S_AXIS_TLAST <= S_AXIS_TLAST;
-            end case;
-        end if;
-    end process;
+    axis_dump_gen_inst : axis_dump_gen
+        generic map (
+            N_BYTES                 =>  N_BYTES                ,
+            ASYNC                   =>  false                   ,
+            MODE                    =>  MODE -- "SINGLE", "ZEROS", "BYTE"
+        )
+        port map (
+            CLK                      =>  CLK                                                     ,
+            RESET                    =>  RESET                                                   ,
+            
+            ENABLE                  =>  gen_enable                                                  ,
+            PAUSE                   =>  gen_pause                                                   ,
+            WORD_LIMIT              =>  gen_word_limit                                              ,
+            
+            M_AXIS_CLK              =>  CLK                                                     ,
+            M_AXIS_TDATA            =>  S_AXIS_TDATA                                            ,
+            M_AXIS_TKEEP            =>  S_AXIS_TKEEP                                            ,
+            M_AXIS_TVALID           =>  S_AXIS_TVALID                                           ,
+            M_AXIS_TREADY           =>  S_AXIS_TREADY                                           ,
+            M_AXIS_TLAST            =>  S_AXIS_TLAST                                             
+        );
+
+gen_enable <= '1' when i > 1000 else '0';
+gen_pause <= x"00001000";
+gen_word_limit <= x"00001000";
+
 
 end tb_axis_checker_arch;
