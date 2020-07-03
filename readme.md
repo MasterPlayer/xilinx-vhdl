@@ -29,7 +29,7 @@ Include fifo primitives for instantiate them to other component for flexibility 
 5 | [fifo_cmd_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_cmd_sync_xpm/fifo_cmd_sync_xpm.vhd) | Syncronous fifo for realize command support 
 6 | [fifo_in_pkt_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_pkt_sw/fifo_in_pkt_sw.vhd) | Syncronous fifo for accumulate packets 
 7 | [fifo_in_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_sync_xpm/fifo_in_sync_xpm.vhd) | Syncronous fifo for implement Slave AXI-Stream
-8 | [fifo_in_async_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_async_xpm/fifo_ain_sync_xpm.vhd) | Asyncronous fifo for implement Slave AXI-Stream
+8 | [fifo_in_async_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_async_xpm/fifo_in_async_xpm.vhd) | Asyncronous fifo for implement Slave AXI-Stream
 
 
 -------------
