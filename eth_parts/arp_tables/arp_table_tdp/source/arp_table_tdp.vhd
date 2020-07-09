@@ -8,7 +8,7 @@ library UNISIM;
     use UNISIM.VComponents.all;
 
 
-entity arp_table is
+entity arp_table_tdp is
     generic (
         N_ELEMENTS              :           integer     := 32                           ;
         ADDR_WIDTH              :           integer     := 5                            ;
@@ -44,18 +44,18 @@ entity arp_table is
         SRC_PORT_OUT            :   out     std_logic_vector ( 15 downto 0 )            ;
         DVO                     :   out     std_logic                                    
     );
-end arp_table;
+end arp_table_tdp;
 
 
 
-architecture arp_table_arch of arp_table is
+architecture arp_table_tdp_arch of arp_table_tdp is
 
 
     constant version : string := "v1.0" ;
     
     constant  DATA_WIDTH : integer := DST_MAC_OUT'length + DST_IP_OUT'length + DST_PORT_OUT'length + SRC_IP_OUT'length + SRC_PORT_OUT'length;
-    constant  READ_LATENCY_A : integer := 2                 ;
-    constant  READ_LATENCY_B : integer := 2  ;
+    constant  READ_LATENCY_A : integer := 1                 ;
+    constant  READ_LATENCY_B : integer := 1  ;
 
     component tdpram_xpm
         generic(
@@ -164,4 +164,4 @@ begin
     SRC_PORT_OUT <= DOUTB(143 downto 128) ;
 
 
-end arp_table_arch;
+end arp_table_tdp_arch;
