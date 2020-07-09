@@ -16,6 +16,16 @@ Include some modules, description, testbench files for components, which work wi
 
 -------------
 
+## eth_parts
+
+Include some modules for work with ethernet infrastructure
+
+№ | Name | Description
+--|------|------------
+1 | [arp_tables](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/eth_parts/arp_tables/) | Components for using as ARP tables in our projects
+
+-------------
+
 ## fifo_parametrized 
 
 Include fifo primitives for instantiate them to other component for flexibility configuration
