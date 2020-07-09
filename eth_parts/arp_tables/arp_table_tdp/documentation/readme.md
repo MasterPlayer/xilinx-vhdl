@@ -7,7 +7,7 @@
 
 ![arp_table_struct][logo1]
 
-[logo1]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/eth_parts/arp_table_tdp/documentation/arp_table_tdp.png
+[logo1]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/eth_parts/arp_tables/arp_table_tdp/documentation/arp_table_tdp.png
 
 ## generic-параметры
 Название | Тип | Диапазон значений | Описание
