@@ -77,7 +77,7 @@ begin
             PROG_FULL_THRESH        =>  10                  ,
             RD_DATA_COUNT_WIDTH     =>  FIFO_DATA_COUNT_W   ,
             READ_DATA_WIDTH         =>  FIFO_WIDTH          ,
-            READ_MODE               =>  "std"               ,
+            READ_MODE               =>  "fwft"              ,
             --SIM_ASSERT_CHK          =>  0                   ,
             USE_ADV_FEATURES        =>  "0707"              ,
             WAKEUP_TIME             =>  0                   ,
