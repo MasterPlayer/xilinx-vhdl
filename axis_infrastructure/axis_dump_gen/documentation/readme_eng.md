@@ -88,4 +88,7 @@ where `SPEED` - speed in bit per second
 **8. 02.07.2020 v1.6 - changes on generator **
 - Corrected exit from `PAUSE_ST` to `IDLE_ST` if `ENABLE = 0` and `PAUSE > 0`: transition is forbidden
 
+**9. 29.07.2020 v1.7 - changes on generator ** 
+- corrected word_limit_reg assigning : if work in process, and we change `WORD_LIMIT` value, then new value doesnt apply in previous version
+
 [logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png
