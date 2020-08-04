@@ -25,7 +25,9 @@ entity axis_dds_table is
         PAUSE                   :   in      std_logic_Vector ( 31 downto 0 )                    ;
         WORD_LIMIT              :   in      std_logic_vector ( 31 downto 0 )                    ;
         STEP                    :   in      std_logic_vector ( 31 downto 0 )                    ;
-        
+        EN_CNT                  :   in      std_logic                                           ;
+
+
         M_AXIS_CLK              :   in      std_logic                                           ;
         M_AXIS_TDATA            :   out     std_logic_Vector ( (N_BYTES*8)-1 downto 0 )         ;
         M_AXIS_TKEEP            :   out     std_logic_Vector ( N_BYTES-1 downto 0 )             ;
@@ -123,6 +125,8 @@ architecture axis_dds_table_arch of axis_dds_table is
     signal  eic_cos     :   integer range 0 to 1023 := 255;
     signal  acc2        :   std_logic_vector(31 downto 0) := x"3FC00000";
     signal  acc         :   std_logic_vector(31 downto 0) := (others => '0');
+    
+    signal  data_counter : std_logic_Vector ( 31 downto 0 ) := (others => '0');
 
     signal  sin_sig     :   std_logic_Vector ( 15 downto 0 ) := (others => '0') ;
     signal  cos_sig     :   std_logic_Vector ( 15 downto 0 ) := (others => '0') ;
@@ -130,7 +134,9 @@ architecture axis_dds_table_arch of axis_dds_table is
     type fsm is (
         IDLE_ST                 ,
         PAUSE_ST                ,
-        TX_ST                   
+        PAUSE_CNT_ST            , 
+        TX_ST                   ,
+        TX_CNT_ST                
     );
     
     signal  current_state       :           fsm                                 := IDLE_ST          ;
@@ -224,18 +230,14 @@ begin
                         word_limit_reg <= word_limit_reg;
                     end if;
 
-                when TX_ST => 
+                when TX_ST | TX_CNT_ST => 
                     if out_awfull = '0' then 
                         if word_cnt = word_limit_reg then
-                            --if PAUSE = 0 then 
                             if ENABLE = '1' then 
                                 word_limit_reg <= WORD_LIMIT-1;
                             else
                                 word_limit_reg <= word_limit_reg;    
                             end if;
-                            --else
-                            --    word_limit_reg <= word_limit_reg;     
-                            --end if; 
                         else
                             word_limit_reg <= word_limit_reg;
                         end if;
@@ -261,7 +263,7 @@ begin
                     when IDLE_ST =>
                         pause_reg <= PAUSE;    
 
-                    when TX_ST =>
+                    when TX_ST | TX_CNT_ST =>
                         if out_awfull = '0' then 
                             if word_cnt = word_limit_reg then 
                                 pause_reg <= PAUSE;    
@@ -289,7 +291,7 @@ begin
                 
                 case( current_state ) is
                 
-                    when PAUSE_ST =>
+                    when PAUSE_ST | PAUSE_CNT_ST =>
                         pause_cnt <= pause_cnt + 1;
 
                     when others =>  
@@ -309,14 +311,26 @@ begin
                 case current_state is
                     when IDLE_ST =>
                         if ENABLE = '1' and WORD_LIMIT /= 0 then 
-                            if out_awfull = '0' then 
-                                if PAUSE = 0 then 
-                                    current_state <= TX_ST;
+                            if EN_CNT = '0' then 
+                                if out_awfull = '0' then 
+                                    if PAUSE = 0 then 
+                                        current_state <= TX_ST;
+                                    else
+                                        current_state <= PAUSE_ST;
+                                    end if;
                                 else
-                                    current_state <= PAUSE_ST;
+                                    current_state <= current_state;    
                                 end if;
                             else
-                                current_state <= current_state;    
+                                if out_awfull = '0' then 
+                                    if PAUSE = 0 then 
+                                        current_state <= TX_CNT_ST;
+                                    else
+                                        current_state <= PAUSE_CNT_ST;
+                                    end if;
+                                else
+                                    current_state <= current_state;    
+                                end if;                                    
                             end if;
                         else
                             current_state <= current_state;    
@@ -324,27 +338,63 @@ begin
 
                     when PAUSE_ST =>
                         if pause_reg = 0 then 
-                            current_state <= TX_ST;
+                            if EN_CNT = '0' then 
+                                current_state <= TX_ST;
+                            else
+                                current_state <= TX_CNT_ST;    
+                            end if;
                         else
                             if pause_cnt = pause_reg then 
-                                current_state <= TX_ST;
+                                if EN_CNT = '0' then 
+                                    current_state <= TX_ST;
+                                else
+                                    current_state <= TX_CNT_ST;        
+                                end if;
                             else
                                 current_state <= current_state;
                             end if;
                         end if;
+
+                    when PAUSE_CNT_ST =>
+                        if pause_reg = 0 then 
+                            if EN_CNT = '1' then 
+                                current_state <= TX_CNT_ST;
+                            else
+                                current_state <= TX_ST;
+                            end if; 
+                        else
+                            if pause_cnt = pause_reg then
+                                if EN_CNT = '1' then
+                                    current_state <= TX_CNT_ST;
+                                else
+                                    current_state <= TX_ST;
+                                end if;
+                            else
+                                current_state <= current_state;
+                            end if;
+                        end if;
+
 
                     when TX_ST =>
                         if out_awfull = '0' then 
                             if word_cnt = word_limit_reg then
                                 if pause_reg = 0 then 
                                     if ENABLE = '1' and WORD_LIMIT /= 0 then 
-                                        current_state <= current_state;
+                                        if EN_CNT = '0' then 
+                                            current_state <= current_state; 
+                                        else
+                                            current_state <= TX_CNT_ST;    
+                                        end if;
                                     else
                                         current_state <= IDLE_ST;    
                                     end if;
                                 else
-                                    if ENABLE = '1' and WORD_LIMIT /= 0 then 
-                                        current_state <= PAUSE_ST;     
+                                    if ENABLE = '1' and WORD_LIMIT /= 0 then
+                                        if EN_CNT = '0' then    
+                                            current_state <= PAUSE_ST;     
+                                        else
+                                            current_state <= PAUSE_CNT_ST;    
+                                        end if;
                                     else
                                         current_state <= IDLE_ST;    
                                     end if;
@@ -355,6 +405,39 @@ begin
                         else
                             current_state <= current_state;    
                         end if;
+
+
+                    when TX_CNT_ST =>
+                        if out_awfull = '0' then 
+                            if word_cnt = word_limit_reg then
+                                if pause_reg = 0 then 
+                                    if ENABLE = '1' and WORD_LIMIT /= 0 then 
+                                        if EN_CNT = '1' then 
+                                            current_state <= current_state;
+                                        else
+                                            current_state <= TX_ST;    
+                                        end if;
+                                    else
+                                        current_state <= IDLE_ST;    
+                                    end if;
+                                else
+                                    if ENABLE = '1' and WORD_LIMIT /= 0 then 
+                                        if EN_CNT = '1' then 
+                                            current_state <= PAUSE_CNT_ST;     
+                                        else
+                                            current_state <= PAUSE_ST;
+                                        end if;
+                                    else
+                                        current_state <= IDLE_ST;    
+                                    end if;
+                                end if; 
+                            else
+                                current_state <= current_state;
+                            end if;
+                        else
+                            current_state <= current_state;    
+                        end if;
+
 
                     when others => 
                         current_state <= current_state;
@@ -372,7 +455,7 @@ begin
             else
                 
                 case current_state is
-                    when TX_ST =>
+                    when TX_ST | TX_CNT_ST =>
                         if out_awfull = '0' then 
                             if word_cnt = word_limit_reg then 
                                 word_cnt <= (others => '0');
@@ -456,7 +539,7 @@ begin
                 out_wren <= '0';    
             else
                 case current_state is
-                    when TX_ST =>
+                    when TX_ST | TX_CNT_ST =>
                         if out_awfull = '0' then 
                             out_wren <= '1';
                         else
@@ -470,8 +553,8 @@ begin
         end if;
     end process;
 
-    out_din_data(15 downto  0 ) <= sin_sig;
-    out_din_data(31 downto 16 ) <= cos_sig;
+    out_din_data(15 downto  0 ) <= sin_sig when (current_state = TX_ST or current_state = PAUSE_ST) else data_counter(15 downto 0);
+    out_din_data(31 downto 16 ) <= cos_sig when (current_state = TX_ST or current_state = PAUSE_ST) else data_counter(31 downto 16);
     out_din_data(DATA_WIDTH-1 downto 32) <= (others => '0');
 
     out_din_keep <= (others => '1') ;
@@ -483,7 +566,7 @@ begin
                 out_din_last <= '0';
             else                
                 case current_state is
-                    when TX_ST =>
+                    when TX_ST | TX_CNT_ST =>
                         if (word_cnt = word_limit_reg) then 
                             out_din_last <= '1';
                         else
@@ -498,6 +581,28 @@ begin
         end if;
     end process;
 
+    data_counter_processing : process(CLK)
+    begin
+        if CLK'event anD CLK = '1' then 
+            if RESET = '1' then 
+                data_counter <= (others => '0');
+            else 
+                case current_state is
+                    when TX_CNT_ST => 
+                        if out_awfull = '0' then 
+                            data_counter <= data_counter + 1;
+                        else
+                            data_counter <= data_counter;    
+                        end if;
+
+                    when others => 
+                        data_counter <= data_counter;
+
+                end case;
+            end if;
+        end if;
+    end process;
+
     acc_processing : process(CLK)
     begin
         if CLK'event AND CLK = '1' then 
@@ -505,7 +610,7 @@ begin
                 Acc <= (others => '0');
             else
                 case current_state is
-                    when TX_ST => 
+                    when TX_ST  => 
                         if out_awfull = '0' then 
                             acc <= acc + STEP;
                         else
