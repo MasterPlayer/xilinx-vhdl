@@ -8,3 +8,4 @@
 4 | [**axis_arb_2_to_1**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_arb_2_to_1) | арбитр 2 в 1 с равным приоритетом и опросом по кольцу
 5 | [**axis_pkt_sw_2_to_1**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_pkt_sw_2_to_1) | арбитр 2 в 1 с равным приоритетом, опросом по кольцу. Арбитр копит входные пакеты, и передает на выход только полностью готовые пакеты.
 6 | [**axis_loader_ss**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_loader_ss) | Компонент для программирования ПЛИС по протоколу SlaveSerial
+7 | [**axis_ddr_mgr_fd**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_ddr_mgr_fd) | Компонент для выполнения записи/чтения памяти с использованием AXI-Stream и AXI-Full интерфейса
