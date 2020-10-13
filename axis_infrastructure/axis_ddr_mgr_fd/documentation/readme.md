@@ -156,7 +156,7 @@ WAIT_FOR_FIFO_ABILITY_ST | READ_ST | out_pfull = 0 | при освобожден
 
 ![write_fsm_diag][write_fsm_diagram]
 
-[write_fsm_diagram]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_ddr_mgr_fd/documentation/write_fsm_diagram.png
+[write_fsm_diagram]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_ddr_mgr_fd/documentation/write_fsm_diag.png
 
 #### Состояния конечного автомата 
 
