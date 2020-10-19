@@ -84,11 +84,15 @@ architecture tb_axis_data_delayer_arch of tb_axis_data_delayer is
     signal  DBG_OVERLOAD_TIMER      :           std_Logic                                               ;
 
 
+
     constant  CLK_PERIOD : time := 6400 ps;
 
     signal i                    :           integer                                      := 0;
 
     signal  mclk_duration : integer := 0;
+
+    signal  packet_size_cnt : std_logic_Vector ( 31 downto 0 ) := (others => '0')   ;
+    signal  packet_size_reg : std_logic_Vector ( 31 downto 0 ) := (others => '0')   ;
 
 begin
 
@@ -181,5 +185,36 @@ begin
             end if;
         end if;
     end process;
+
+    packet_size_cnt_processing : process(CLK)
+    begin
+        if CLK'event AND CLK = '1' then 
+            if M_AXIS_TVALID = '1' then 
+                if M_AXIS_TLAST = '1' then 
+                    packet_size_cnt <= (others => '0');
+                else
+                    packet_size_cnt <= packet_size_cnt + 1;
+                end if;
+            else
+                packet_size_cnt <= packet_size_cnt;
+            end if;
+        end if;
+    end process;
+
+    packet_size_reg_processing : process(CLK)
+    begin
+        if CLK'event AND CLK = '1' then 
+            if M_AXIS_TVALID = '1' then 
+                if M_AXIS_TLAST = '1' then 
+                    packet_size_reg <= packet_size_cnt + 1;
+                else
+                    packet_size_reg <= packet_size_reg;
+                end if;
+            else
+                packet_size_reg <= packet_size_reg;
+            end if;
+        end if;
+    end process;
+
 
 end tb_axis_data_delayer_arch;
