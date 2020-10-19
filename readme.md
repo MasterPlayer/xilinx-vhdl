@@ -14,7 +14,7 @@ Include some modules, description, testbench files for components, which work wi
 5 | [axis_pkt_sw_2_to_1](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_pkt_sw_2_to_1) | 2 to 1 AXI-Stream arbiter with accumulation packets, equal priority over both inputs and ring survey 
 6 | [axis_loader_ss](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_loader_ss) | Component for programming FPGA over SlaveSerial protocol
 7 | [axis_ddr_mgr_fd](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_ddr_mgr_fd) | Component for read/write memory over AXI-Stream and AXI-Full
-
+8 | [axis_data_delayer](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_data_delayer) | Component for delaying input data and compensate valid signal in all packet length
 
 -------------
 
