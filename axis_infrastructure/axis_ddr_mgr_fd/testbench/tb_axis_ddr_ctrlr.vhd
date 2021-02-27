@@ -13,9 +13,9 @@ end tb_axis_ddr_ctrlr;
 
 architecture Behavioral of tb_axis_ddr_ctrlr is
 
-    constant  DATA_WIDTH        :           integer := 64                                       ;
+    constant  DATA_WIDTH        :           integer := 128                                      ;
     constant  ADDR_WIDTH        :           integer := 16                                       ;
-    constant  BURST_LIMIT       :           integer := 1                                        ;
+    constant  BURST_LIMIT       :           integer := 256                                      ;
 
 
     component axis_ddr_mgr_fd
@@ -29,7 +29,7 @@ architecture Behavioral of tb_axis_ddr_ctrlr is
             RESET               :   in      std_logic                                           ;
 
             CMD_START_ADDRESS   :   in      std_logic_vector ( ADDR_WIDTH-1 downto 0 )          ;
-            CMD_SIZE            :   in      std_logic_Vector ( 63 downto 0 )                    ;
+            CMD_SIZE            :   in      std_logic_Vector ( 31 downto 0 )                    ;
             CMD_MODE            :   in      std_logic_vector (  1 downto 0 )                    ;
             CMD_VALID           :   in      std_logic                                           ;
             -- INPUT IF
@@ -84,7 +84,7 @@ architecture Behavioral of tb_axis_ddr_ctrlr is
     signal  CLK                 :           std_logic                                      := '0'                   ;
     signal  RESET               :           std_logic                                      := '0'                   ;
     signal  CMD_START_ADDRESS   :           std_logic_vector ( ADDR_WIDTH-1 downto 0 )     := (others => '0')       ;
-    signal  CMD_SIZE            :           std_logic_Vector ( 63 downto 0 )               := (others => '0')       ;
+    signal  CMD_SIZE            :           std_logic_Vector ( 31 downto 0 )               := (others => '0')       ;
     signal  CMD_MODE            :           std_logic_vector (  1 downto 0 )               := (others => '0')       ;
     signal  CMD_VALID           :           std_logic                                      := '0'                   ;
     signal  S_AXIS_TDATA        :           std_logic_vector ( DATA_WIDTH-1 downto 0 )     := (others => '0')       ;
@@ -130,7 +130,7 @@ architecture Behavioral of tb_axis_ddr_ctrlr is
     constant CLK_PERIOD : time := 10 ns;
     signal i : integer := 0;
     signal i_slow : integer := 0;
-
+ 
     component axi_bram_ctrl_0
         port (
             s_axi_aclk          :   in          std_logic                                                           ;
@@ -144,8 +144,8 @@ architecture Behavioral of tb_axis_ddr_ctrlr is
             s_axi_awprot        :   in          std_logic_vector (  2 downto 0 )                                    ;
             s_axi_awvalid       :   in          std_logic                                                           ;
             s_axi_awready       :   out         std_logic                                                           ;
-            s_axi_wdata         :   in          std_logic_vector ( 63 downto 0 )                                    ;
-            s_axi_wstrb         :   in          std_logic_vector (  7 downto 0 )                                    ;
+            s_axi_wdata         :   in          std_logic_vector (127 downto 0 )                                    ;
+            s_axi_wstrb         :   in          std_logic_vector ( 15 downto 0 )                                    ;
             s_axi_wlast         :   in          std_logic                                                           ;
             s_axi_wvalid        :   in          std_logic                                                           ;
             s_axi_wready        :   out         std_logic                                                           ;
@@ -161,7 +161,7 @@ architecture Behavioral of tb_axis_ddr_ctrlr is
             s_axi_arprot        :   in          std_logic_vector (  2 downto 0 )                                    ;
             s_axi_arvalid       :   in          std_logic                                                           ;
             s_axi_arready       :   out         std_logic                                                           ;
-            s_axi_rdata         :   out         std_logic_vector ( 63 downto 0 )                                    ;
+            s_axi_rdata         :   out         std_logic_vector (127 downto 0 )                                    ;
             s_axi_rresp         :   out         std_logic_vector (  1 downto 0 )                                    ;
             s_axi_rlast         :   out         std_logic                                                           ;
             s_axi_rvalid        :   out         std_logic                                                           ;
@@ -200,6 +200,10 @@ architecture Behavioral of tb_axis_ddr_ctrlr is
 
     signal  slow_clk : std_logic := '0';
 
+    signal  i_rdy : integer := 0;
+
+    signal  data_cnt : integer := 0;
+
 begin
 
     CLK <= not CLK after CLK_PERIOD/2;
@@ -231,12 +235,12 @@ begin
         end if;
     end process;
 
-    ENABLE_processing : process(slow_clk)
+    ENABLE_processing : process(CLK)
     begin
-        if slow_clk'event AND slow_clk = '1' then 
-            case i_slow is
-                when 1000   => ENABLE <= '1'; PAUSE <= x"00000100"; WORD_LIMIT <= x"00000001";
-                when others => ENABLE <= '0'; PAUSE <= PAUSE; WORD_LIMIT <= WORD_LIMIT; 
+        if CLK'event AND CLK = '1' then 
+            case i is
+                when 1100   => ENABLE <= '1'; PAUSE <= x"00000000"; WORD_LIMIT <= x"00001000";
+                when others => ENABLE <= ENABLE; PAUSE <= PAUSE; WORD_LIMIT <= WORD_LIMIT; 
             end case;
         end if;
     end process;
@@ -245,7 +249,11 @@ begin
     begin
         if CLK'event AND CLK = '1' then 
             case i is 
-                when 1000   => CMD_START_ADDRESS <= x"0000"; CMD_SIZE <= x"0000000000000008"; CMD_MODE <= "11"; CMD_VALID <= '1';
+                --when 1000   => CMD_START_ADDRESS <= x"0000"; CMD_SIZE <= x"0000000000008000"; CMD_MODE <= "10"; CMD_VALID <= '1';
+                when 2000 => CMD_START_ADDRESS <= x"0000"; CMD_SIZE <= x"00002000"; CMD_MODE <= "01"; CMD_VALID <= '1';
+                when 20001 => CMD_START_ADDRESS <= x"0000"; CMD_SIZE <= x"00002000"; CMD_MODE <= "01"; CMD_VALID <= '1';
+                when 40002 => CMD_START_ADDRESS <= x"0000"; CMD_SIZE <= x"00002000"; CMD_MODE <= "01"; CMD_VALID <= '1';
+                when 60003 => CMD_START_ADDRESS <= x"0000"; CMD_SIZE <= x"00002000"; CMD_MODE <= "01"; CMD_VALID <= '1';
                 when others => CMD_START_ADDRESS <= CMD_START_ADDRESS; CMD_SIZE <= CMD_SIZE; CMD_MODE <= CMD_MODE; CMD_VALID <= '0';
             end case;
         end if;
@@ -253,12 +261,12 @@ begin
 
     axis_dump_gen_inst : axis_dump_gen
         generic map (
-            N_BYTES                 =>  8                   ,
-            ASYNC                   =>  true                ,
+            N_BYTES                 =>  16                  ,
+            ASYNC                   =>  false               ,
             MODE                    =>  "SINGLE"            -- "SINGLE", "ZEROS", "BYTE"
         )
         port map (
-            CLK                     =>  slow_clk                                                         ,
+            CLK                     =>  CLK                                                         ,
             RESET                   =>  RESET                                                       ,
             
             ENABLE                  =>  ENABLE                                                      ,
@@ -336,43 +344,78 @@ begin
             M_AXI_RREADY        =>  M_AXI_RREADY         
         );
 
-    M_AXIS_TREADY <= '1';
+
+
+    --M_AXIS_TREADY <= '1';
+
+    data_cnt_processing : process(CLK)
+    begin
+        if CLK'event AND CLK = '1' then 
+            if M_AXIS_TVALID = '1' and M_AXIS_TREADY = '1' then 
+                data_cnt <= data_cnt + 1;
+            end if;
+        end if;
+    end process;
+
+    i_rdy_processing : process(CLK)
+    begin
+        if CLK'event AND CLK = '1' then 
+            if i_rdy < 5 then 
+                i_rdy <= i_rdy + 1;
+            else
+                i_rdy <= 0;
+            end if;
+        end if;
+    end process;
+
+    M_AXIS_TREADY_processing : process(CLK)
+    begin
+        if CLK'event AND CLK = '1' then 
+            if i_rdy = 4 then 
+                M_AXIS_TREADY <= '1';
+            else
+                M_AXIS_TREADY <= '0';
+            end if;
+        end if;
+    end process;
 
     axi_bram_ctrl_0_inst : axi_bram_ctrl_0
         port map (
-            s_axi_aclk          =>  CLK                         ,
-            s_axi_aresetn       =>  not(RESET)                  ,
-            s_axi_awaddr        =>  M_AXI_AWADDR                ,
-            s_axi_awlen         =>  M_AXI_AWLEN                 ,
-            s_axi_awsize        =>  M_AXI_AWSIZE                ,
-            s_axi_awburst       =>  M_AXI_AWBURST               ,
-            s_axi_awlock        =>  M_AXI_AWLOCK                ,
-            s_axi_awcache       =>  M_AXI_AWCACHE               ,
-            s_axi_awprot        =>  M_AXI_AWPROT                ,
-            s_axi_awvalid       =>  M_AXI_AWVALID               ,
-            s_axi_awready       =>  M_AXI_AWREADY               ,
-            s_axi_wdata         =>  M_AXI_WDATA                 ,
-            s_axi_wstrb         =>  M_AXI_WSTRB                 ,
-            s_axi_wlast         =>  M_AXI_WLAST                 ,
-            s_axi_wvalid        =>  M_AXI_WVALID                ,
-            s_axi_wready        =>  M_AXI_WREADY                ,
-            s_axi_bresp         =>  M_AXI_BRESP                 ,
-            s_axi_bvalid        =>  M_AXI_BVALID                ,
-            s_axi_bready        =>  M_AXI_BREADY                ,
-            s_axi_araddr        =>  M_AXI_ARADDR                ,
-            s_axi_arlen         =>  M_AXI_ARLEN                 ,
-            s_axi_arsize        =>  M_AXI_ARSIZE                ,
-            s_axi_arburst       =>  M_AXI_ARBURST               ,
-            s_axi_arlock        =>  M_AXI_ARLOCK                ,
-            s_axi_arcache       =>  M_AXI_ARCACHE               ,
-            s_axi_arprot        =>  M_AXI_ARPROT                ,
-            s_axi_arvalid       =>  M_AXI_ARVALID               ,
-            s_axi_arready       =>  M_AXI_ARREADY               ,
-            s_axi_rdata         =>  M_AXI_RDATA                 ,
-            s_axi_rresp         =>  M_AXI_RRESP                 ,
-            s_axi_rlast         =>  M_AXI_RLAST                 ,
-            s_axi_rvalid        =>  M_AXI_RVALID                ,
-            s_axi_rready        =>  M_AXI_RREADY                
+            s_axi_aclk          =>  CLK                     ,
+            s_axi_aresetn       =>  not(RESET)              ,
+            s_axi_awaddr        =>  M_AXI_AWADDR            ,
+            s_axi_awlen         =>  M_AXI_AWLEN             ,
+            s_axi_awsize        =>  M_AXI_AWSIZE            ,
+            s_axi_awburst       =>  M_AXI_AWBURST           ,
+            s_axi_awlock        =>  M_AXI_AWLOCK            ,
+            s_axi_awcache       =>  M_AXI_AWCACHE           ,
+            s_axi_awprot        =>  M_AXI_AWPROT            ,
+            s_axi_awvalid       =>  M_AXI_AWVALID           ,
+            s_axi_awready       =>  M_AXI_AWREADY           ,
+            s_axi_wdata         =>  M_AXI_WDATA             ,
+            s_axi_wstrb         =>  M_AXI_WSTRB             ,
+            s_axi_wlast         =>  M_AXI_WLAST             ,
+            s_axi_wvalid        =>  M_AXI_WVALID            ,
+            s_axi_wready        =>  M_AXI_WREADY            ,
+            s_axi_bresp         =>  M_AXI_BRESP             ,
+            s_axi_bvalid        =>  M_AXI_BVALID            ,
+            s_axi_bready        =>  M_AXI_BREADY            ,
+            s_axi_araddr        =>  M_AXI_ARADDR            ,
+            s_axi_arlen         =>  M_AXI_ARLEN             ,
+            s_axi_arsize        =>  M_AXI_ARSIZE            ,
+            s_axi_arburst       =>  M_AXI_ARBURST           ,
+            s_axi_arlock        =>  M_AXI_ARLOCK            ,
+            s_axi_arcache       =>  M_AXI_ARCACHE           ,
+            s_axi_arprot        =>  M_AXI_ARPROT            ,
+            s_axi_arvalid       =>  M_AXI_ARVALID           ,
+            s_axi_arready       =>  M_AXI_ARREADY           ,
+            s_axi_rdata         =>  M_AXI_RDATA             ,
+            s_axi_rresp         =>  M_AXI_RRESP             ,
+            s_axi_rlast         =>  M_AXI_RLAST             ,
+            s_axi_rvalid        =>  M_AXI_RVALID            ,
+            s_axi_rready        =>  M_AXI_RREADY             
         );
+
+
 
 end Behavioral;

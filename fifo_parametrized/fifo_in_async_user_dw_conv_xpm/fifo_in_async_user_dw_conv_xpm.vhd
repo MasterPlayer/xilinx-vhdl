@@ -13,39 +13,40 @@ Library xpm;
 
 
 
-entity fifo_out_sync_xpm is
-    generic(
-        DATA_WIDTH      :           integer         :=  16                          ;
-        MEMTYPE         :           String          :=  "block"                     ;
-        DEPTH           :           integer         :=  16                           
+entity fifo_out_sync_dw_conv_xpm is
+    generic (
+        INPUT_DATA_WIDTH        :           integer         :=  16                          ;
+        OUTPUT_DATA_WIDTH       :           integer         :=  16                          ;
+        MEMTYPE                 :           String          :=  "block"                     ;
+        DEPTH                   :           integer         :=  16                           
     );
     port(
-        CLK             :   in      std_logic                                       ;
-        RESET           :   in      std_logic                                       ;
+        CLK                     :   in      std_logic                                       ;
+        RESET                   :   in      std_logic                                       ;
         
-        OUT_DIN_DATA    :   in      std_logic_Vector ( DATA_WIDTH-1 downto 0 )      ;
-        OUT_DIN_KEEP    :   in      std_logic_Vector ( ( DATA_WIDTH/8)-1 downto 0 ) ;
-        OUT_DIN_LAST    :   in      std_logic                                       ;
-        OUT_WREN        :   in      std_logic                                       ;
-        OUT_FULL        :   out     std_logic                                       ;
-        OUT_AWFULL      :   out     std_logic                                       ;
+        OUT_DIN_DATA            :   in      std_logic_Vector ( INPUT_DATA_WIDTH-1 downto 0 )      ;
+        OUT_DIN_KEEP            :   in      std_logic_Vector ( ( INPUT_DATA_WIDTH/8)-1 downto 0 ) ;
+        OUT_DIN_LAST            :   in      std_logic                                       ;
+        OUT_WREN                :   in      std_logic                                       ;
+        OUT_FULL                :   out     std_logic                                       ;
+        OUT_AWFULL              :   out     std_logic                                       ;
         
-        M_AXIS_TDATA    :   out     std_logic_Vector ( DATA_WIDTH-1 downto 0 )      ;
-        M_AXIS_TKEEP    :   out     std_logic_Vector (( DATA_WIDTH/8)-1 downto 0 )  ;
-        M_AXIS_TVALID   :   out     std_logic                                       ;
-        M_AXIS_TLAST    :   out     std_logic                                       ;
-        M_AXIS_TREADY   :   in      std_logic                                        
-
+        M_AXIS_TDATA            :   out     std_logic_Vector ( OUTPUT_DATA_WIDTH-1 downto 0 )      ;
+        M_AXIS_TKEEP            :   out     std_logic_Vector (( OUTPUT_DATA_WIDTH/8)-1 downto 0 )  ;
+        M_AXIS_TVALID           :   out     std_logic                                       ;
+        M_AXIS_TLAST            :   out     std_logic                                       ;
+        M_AXIS_TREADY           :   in      std_logic                                        
     );
-end fifo_out_sync_xpm;
+end fifo_out_sync_dw_conv_xpm;
 
 
 
-architecture fifo_out_sync_xpm_arch of fifo_out_sync_xpm is
+architecture fifo_out_sync_dw_conv_xpm_arch of fifo_out_sync_dw_conv_xpm is
 
     constant VERSION : string := "v1.0";
 
-    constant FIFO_WIDTH :           integer := DATA_WIDTH + ((DATA_WIDTH/8) + 1);
+    constant INPUT_FIFO_WIDTH   :           integer := INPUT_DATA_WIDTH + ((INPUT_DATA_WIDTH/8) + 1);
+    constant OUTPUT_FIFO_WIDTH  :           integer := INPUT_DATA_WIDTH + ((INPUT_DATA_WIDTH/8) + 1);
     constant FIFO_DATA_COUNT_W  :   integer := integer(ceil(log2(real(DEPTH))));
 
     ATTRIBUTE X_INTERFACE_INFO : STRING;
@@ -54,8 +55,8 @@ architecture fifo_out_sync_xpm_arch of fifo_out_sync_xpm is
     ATTRIBUTE X_INTERFACE_PARAMETER of RESET: SIGNAL is "POLARITY ACTIVE_HIGH";
 
     
-    signal  din         :           std_logic_vector ( FIFO_WIDTH-1 downto 0 ) ;
-    signal  dout        :           std_logic_vector ( FIFO_WIDTH-1 downto 0 ) ;
+    signal  din         :           std_logic_vector ( INPUT_FIFO_WIDTH-1 downto 0 ) ;
+    signal  dout        :           std_logic_vector ( OUTPUT_FIFO_WIDTH-1 downto 0 ) ;
     
     signal  empty       :           std_logic                                   ;
     signal  rden        :           std_logic                                   ;
@@ -64,31 +65,31 @@ begin
 
     rden <= '1' when empty = '0' and M_AXIS_TREADY = '1' else '0';
    
-    M_AXIS_TDATA <= dout( DATA_WIDTH-1 downto 0 ) ;
-    M_AXIS_TKEEP <= dout( ((DATA_WIDTH + (DATA_WIDTH/8))-1) downto DATA_WIDTH );
-    M_AXIS_TLAST <= dout( DATA_WIDTH + (DATA_WIDTH/8));
+    M_AXIS_TDATA <= dout( OUTPUT_DATA_WIDTH-1 downto 0 ) ;
+    M_AXIS_TKEEP <= dout( ((OUTPUT_DATA_WIDTH + (OUTPUT_DATA_WIDTH/8))-1) downto OUTPUT_DATA_WIDTH );
+    M_AXIS_TLAST <= dout( OUTPUT_DATA_WIDTH + (OUTPUT_DATA_WIDTH/8));
     M_AXIS_TVALID <= not (empty)    ;
 
     din <= OUT_DIN_LAST & OUT_DIN_KEEP & OUT_DIN_DATA;
     
 
-    fifo_out_xpm_inst : xpm_fifo_sync
+    fifo_out_xpm_isnt : xpm_fifo_sync
         generic map (
             DOUT_RESET_VALUE        =>  "0"                 ,
             ECC_MODE                =>  "no_ecc"            ,
             FIFO_MEMORY_TYPE        =>  MEMTYPE             ,
             FIFO_READ_LATENCY       =>  0                   ,
             FIFO_WRITE_DEPTH        =>  DEPTH               ,
-            FULL_RESET_VALUE        =>  1                   ,
+            FULL_RESET_VALUE        =>  0                   ,
             PROG_EMPTY_THRESH       =>  10                  ,
             PROG_FULL_THRESH        =>  10                  ,
             RD_DATA_COUNT_WIDTH     =>  FIFO_DATA_COUNT_W   ,   -- DECIMAL
-            READ_DATA_WIDTH         =>  FIFO_WIDTH          ,
+            READ_DATA_WIDTH         =>  OUTPUT_FIFO_WIDTH   ,
             READ_MODE               =>  "fwft"              ,
             --SIM_ASSERT_CHK          =>  0                   ,
             USE_ADV_FEATURES        =>  "0008"              ,
             WAKEUP_TIME             =>  0                   ,
-            WRITE_DATA_WIDTH        =>  FIFO_WIDTH          ,
+            WRITE_DATA_WIDTH        =>  INPUT_DATA_WIDTH    ,
             WR_DATA_COUNT_WIDTH     =>  FIFO_DATA_COUNT_W       -- DECIMAL
         )
         port map (
@@ -121,4 +122,4 @@ begin
 
 
 
-end fifo_out_sync_xpm_arch;
+end fifo_out_sync_dw_conv_xpm_arch;
