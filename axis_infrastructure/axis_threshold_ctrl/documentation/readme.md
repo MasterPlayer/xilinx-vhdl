@@ -69,7 +69,13 @@ M_AXIS_TLAST | output | 1 | сигнал конца пакета
 - Внутри схемы сигналы сброса синхронизируются компонентом rst_syncer
 
 ## Необходимые внешние компоненты
+
 Название компонент | Описание
+[fifo_cmd_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_cmd_sync_xpm/fifo_cmd_sync_xpm.vhd) | Примитив для поддержки очереди команд, синхронный
+[fifo_in_sync_user_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_sync_user_xpm/fifo_in_sync_user_xpm.vhd) | Примитив входной синхронной очереди для поддержки Slave AXI-Stream
+[fifo_in_async_user_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_async_user_xpm/fifo_in_async_user_xpm.vhd) | Примитив входной асинхронной очереди для поддержки Slave AXI-Stream
+[fifo_out_sync_tuser_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_sync_tuser_xpm/fifo_out_sync_tuser_xpm.vhd) | Примитив выходной синхронной очереди для поддержки Master AXI-Stream
+[fifo_out_async_tuser_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_out_async_user_xpm/fifo_out_async_user_xpm.vhd) | Примитив выходной асинхронной очереди для поддержки Master AXI-Stream
 
 
 ## Лог изменений
