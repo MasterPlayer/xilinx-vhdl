@@ -10,3 +10,7 @@
 6 | [**axis_loader_ss**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_loader_ss) | Компонент для программирования ПЛИС по протоколу SlaveSerial
 7 | [**axis_ddr_mgr_fd**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_ddr_mgr_fd) | Компонент для выполнения записи/чтения памяти с использованием AXI-Stream и AXI-Full интерфейса
 8 | [**axis_data_delayer**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_data_delayer) | Компонент для задержки данных. 
+9 | [**axis_loader_ssm**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_loader_ssm) | Компонент для программирования ПЛИС по протоколу SlaveSerialMAP
+10 | [**axis_threshold_ctrl**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_threshold_ctrl) | Компонент для контроля пропускной способности интерфейса AXI-Stream 
+11 | [**axis_dds_table**](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_dds_table) | Компонент для генерации синусоидального сигнала
+ 
