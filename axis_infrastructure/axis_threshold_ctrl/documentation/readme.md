@@ -71,6 +71,7 @@ M_AXIS_TLAST | output | 1 | сигнал конца пакета
 ## Необходимые внешние компоненты
 
 Название компонент | Описание
+-------------------|---------
 [fifo_cmd_sync_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_cmd_sync_xpm/fifo_cmd_sync_xpm.vhd) | Примитив для поддержки очереди команд, синхронный
 [fifo_in_sync_user_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_sync_user_xpm/fifo_in_sync_user_xpm.vhd) | Примитив входной синхронной очереди для поддержки Slave AXI-Stream
 [fifo_in_async_user_xpm](https://github.com/MasterPlayer/xilinx-vhdl/blob/master/fifo_parametrized/fifo_in_async_user_xpm/fifo_in_async_user_xpm.vhd) | Примитив входной асинхронной очереди для поддержки Slave AXI-Stream
@@ -80,4 +81,4 @@ M_AXIS_TLAST | output | 1 | сигнал конца пакета
 
 ## Лог изменений
 
-** 1. 16.04.2021 v1.0 - первая версия **
+**1. 16.04.2021 v1.0 - первая версия**
