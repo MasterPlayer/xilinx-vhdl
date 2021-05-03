@@ -17,6 +17,7 @@ Include some modules, description, testbench files for components, which work wi
 8 | [axis_data_delayer](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_data_delayer) | Component for delaying input data and compensate valid signal in all packet length
 9 | [axis_loader_ssm](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_loader_ssm) | Component for programming external FPGA over Slave SerialMAP protocol
 10 | [axis_threshold_ctrl](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_threshold_ctrl) | Component for control data speed with support AXI-Stream 
+11 | [axis_micron_nor_ctrlr_x4](https://github.com/MasterPlayer/xilinx-vhdl/tree/master/axis_infrastructure/axis_micron_nor_ctrlr_x4) | Component for provide accessing to Micron NOR MT25Q Flash
 
 -------------
 
