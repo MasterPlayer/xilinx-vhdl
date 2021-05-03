@@ -106,7 +106,7 @@ S | out | 1 | сигнал разрешения работы FLASH (CHIP_SELECT)
 - В начальный момент времени флеш должна быть без предустановки работы в режиме QuadSPI, в противном случае не гарантируется корректная работа 
 - У компонента есть начальная фаза инициализации, при которой устанавливается режим работы с адресом 4 байта, режим QuadSPI
 - Установка конфигурации происходит посредством записи в Volatile-регистр FLASH через последовательный интерфейс (Extended SPI)
-- Установка режима адреса 4 байт происходит через команду ENABLE_FOUR_BYTE_ADDRESS_MODE (0xB7)
+- Установка режима адреса 4 байт происходит через команду `ENABLE_FOUR_BYTE_ADDRESS_MODE` (0xB7)
 - Компонент умеет читать всю FLASH за одну команду. 
 - Компонент умеет стирать FLASH за одну команду(вернее ее половину, в случае если размер флеш = 1 гбит)
 - Компонент умеет записывать не более 256 байт за одну команду, контроль размера данных компонент не делает
@@ -122,11 +122,13 @@ S | out | 1 | сигнал разрешения работы FLASH (CHIP_SELECT)
 ### 2.1 Подключение компонента при MODE=STARTUPE
 
 ![axis_micron_nor_ctrlr_x4_startupe][axis_micron_nor_ctrlr_x4_startupe_link]
+
 [axis_micron_nor_ctrlr_x4_startupe_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_startupe.png)
 
 ### 2.2 Подключение компонента при MODE=DIRECT
 
 ![axis_micron_nor_ctrlr_x4_direct][axis_micron_nor_ctrlr_x4_direct_link]
+
 [axis_micron_nor_ctrlr_x4_direct_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_direct.png)
 
 
@@ -137,6 +139,7 @@ S | out | 1 | сигнал разрешения работы FLASH (CHIP_SELECT)
 ### 3.1 Процесс инициализации 
 
 ![axis_micron_nor_ctrlr_x4_fsm_init][axis_micron_nor_ctrlr_x4_fsm_init_link]
+
 [axis_micron_nor_ctrlr_x4_fsm_init_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_init.png)
 
 #### 3.1.1 Состояния конечного автомата процесса инициализации
@@ -146,7 +149,7 @@ S | out | 1 | сигнал разрешения работы FLASH (CHIP_SELECT)
 RST_ST | Выдаем сигнал сброса наружу 1000 тактов после собственного сброса | W_CFG_REG_WE_CMD_ST | счетчик сброса досчитал до 1000
 W_CFG_REG_WE_CMD_ST | Отправляет команду разрешения записи | V_CFG_REG_WE_STUB_ST | Команда полностью передача на устройство (8 отсчетов)
 V_CFG_REG_WE_STUB_ST | Ждем паузу между командами 1 такт | V_CFG_REG_CMD_ST | безусловный переход
-V_CFG_REG_CMD_ST | Отправляем команду 0x61 (WRITE ENHANCED VOLATILE CONFIGURATION REGISTER) на устройство | V_CFG_REG_DATA_ST | Команда полностью передана на устройство (8 отсчетов)
+V_CFG_REG_CMD_ST | Отправляем команду 0x61 (`WRITE ENHANCED VOLATILE CONFIGURATION REGISTER`) на устройство | V_CFG_REG_DATA_ST | Команда полностью передана на устройство (8 отсчетов)
 V_CFG_REG_DATA_ST | Отправляем новое значение, которое запишется в регистр | ENABLE_FOUR_BYTE_PREPARE | Данные переданы на устройство
 ENABLE_FOUR_BYTE_PREPARE | Выжидаем паузу 8 тактов | ENABLE_FOUR_BYTE_CMD_ST | Пауза 8 тактов прошла
 ENABLE_FOUR_BYTE_CMD_ST | Отправляем команду 0xB7 | FINALIZE_ST | счетчик слов = 1(оба полубайта переданы)
@@ -156,12 +159,14 @@ IDLE_ST | Ничего не делаем | IDLE_ST | Не представлен
 #### 3.1.2. Диаграмма процесса инициализации
 
 ![axis_micron_nor_ctrlr_x4_init][axis_micron_nor_ctrlr_x4_init_link]
+
 [axis_micron_nor_ctrlr_x4_init_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_init.png)
 
 
 ### 3.2 Операция записи 
 
 ![axis_micron_nor_ctrlr_x4_fsm_program][axis_micron_nor_ctrlr_x4_fsm_program_link]
+
 [axis_micron_nor_ctrlr_x4_fsm_program_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_program.png)
 
 #### 3.2.1. Состояния конечного автомата операции записи
@@ -178,8 +183,8 @@ PROGRAM_DATA_STUB_ST | Ждем 1 такт | READ_STATUS_ST | Безусловн
 READ_STATUS_CMD_ST | Отправка команды READ_STATUS (0x70) | READ_STATUS_DATA_ST | Команда отправлена полностью 
 READ_STATUS_DATA_ST | Чтение статуса с флеш | READ)STATUS_STUB_ST | Статус полностью прочитан (2 такта, 1 байт)
 READ_STATUS_STUB_ST | Ждем 1 такт | READ_STATUS_CHK_ST | Безусловный переход
-READ_STATUS_CHK_ST | Проверяем статус | READ_STATUS_CMD_ST | Если статус FLASH = занят(bit7=0), то переходим к новому запросу статуса с флеш
-READ_STATUS_CHK_ST | Проверяем статус | FINALIZE_ST | Если статус FLASH = свободен(bit7=1), то переходим к завершению команды
+READ_STATUS_CHK_ST | Проверяем статус | READ_STATUS_CMD_ST | Если статус FLASH = занят(`bit7=0`), то переходим к новому запросу статуса с флеш
+READ_STATUS_CHK_ST | Проверяем статус | FINALIZE_ST | Если статус FLASH = свободен(`bit7=1`), то переходим к завершению команды
 FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловный
 
 #### 3.2.2 Диаграмма процесса записи 
@@ -187,16 +192,19 @@ FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловны
 Начало
 
 ![axis_micron_nor_ctrlr_x4_programstart][axis_micron_nor_ctrlr_x4_programstart_link]
+
 [axis_micron_nor_ctrlr_x4_programstart_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_programstart.png)
 
 Конец
 
 ![axis_micron_nor_ctrlr_x4_programend][axis_micron_nor_ctrlr_x4_programend_link]
+
 [axis_micron_nor_ctrlr_x4_programend_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_programend.png)
 
 ### 3.3 Операция стирания
 
 ![axis_micron_nor_ctrlr_x4_fsm_erase][axis_micron_nor_ctrlr_x4_fsm_erase_link]
+
 [axis_micron_nor_ctrlr_x4_fsm_erase_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_erase.png)
 
 #### 3.3.1. Состояния конечного автомата операции стирания 
@@ -213,8 +221,8 @@ ERASE_STUB_ST | Ждем 1 такт | READ_STATUS_CMD_ST | Безусловны�
 READ_STATUS_CMD_ST | Отправка команды READ_STATUS (0x70) | READ_STATUS_DATA_ST | Команда отправлена полностью 
 READ_STATUS_DATA_ST | Чтение статуса с флеш | READ)STATUS_STUB_ST | Статус полностью прочитан (2 такта, 1 байт)
 READ_STATUS_STUB_ST | Ждем 1 такт | READ_STATUS_CHK_ST | Безусловный переход
-READ_STATUS_CHK_ST | Проверяем статус | READ_STATUS_CMD_ST | Если статус FLASH = занят(bit7=0), то переходим к новому запросу статуса с флеш
-READ_STATUS_CHK_ST | Проверяем статус | FINALIZE_ST | Если статус FLASH = свободен(bit7=1), то переходим к завершению команды
+READ_STATUS_CHK_ST | Проверяем статус | READ_STATUS_CMD_ST | Если статус FLASH = занят(`bit7=0`), то переходим к новому запросу статуса с FLASH
+READ_STATUS_CHK_ST | Проверяем статус | FINALIZE_ST | Если статус FLASH = свободен(`bit7=1`), то переходим к завершению команды
 FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловный
 
 ### 3.4 Операция чтения 
@@ -222,6 +230,7 @@ FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловны
 Внимание: состояние READ_DATA_WAIT_ABILITY не будут отрабатывать корректно, необходимо внесение изменений
 
 ![axis_micron_nor_ctrlr_x4_fsm_read][axis_micron_nor_ctrlr_x4_fsm_read_link]
+
 [axis_micron_nor_ctrlr_x4_fsm_read_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_read.png)
 
 Текущее состояние | Действия | Следующее состояние | Условие перехода
@@ -240,6 +249,7 @@ FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловны
 Возникает когда записанные данные не содержат в своем составе команды из списка
 
 ![axis_micron_nor_ctrlr_x4_fsm_nocmd][axis_micron_nor_ctrlr_x4_fsm_nocmd_link]
+
 [axis_micron_nor_ctrlr_x4_fsm_nocmd_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_nocmd.png)
 
 ## 4. Необходимые внешние компоненты 
@@ -257,7 +267,7 @@ FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловны
 
 ### 5.1 Скорости
 
-Компонент тестирован при работе с реальной FLASH-памятью Micron NOR MT25Q, объемом 1 Гбит. Сбоев в процессе работы не наблюдалось, при этом получились значения скорости следующие. 
+Компонент тестирован при работе с реальной FLASH-памятью `Micron NOR MT25Q`, объемом 1 Гбит. Сбоев в процессе работы не наблюдалось, при этом получились значения скорости следующие. 
 
 При этом, надо понимать что время выполнения операций стирания/программирования зависит от характера самих данных. Это свойство самой флеш
 
