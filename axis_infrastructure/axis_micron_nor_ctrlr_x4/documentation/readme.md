@@ -123,13 +123,13 @@ S | out | 1 | сигнал разрешения работы FLASH (CHIP_SELECT)
 
 ![axis_micron_nor_ctrlr_x4_startupe][axis_micron_nor_ctrlr_x4_startupe_link]
 
-[axis_micron_nor_ctrlr_x4_startupe_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_startupe.png)
+[axis_micron_nor_ctrlr_x4_startupe_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_startupe.png
 
 ### 2.2 Подключение компонента при MODE=DIRECT
 
 ![axis_micron_nor_ctrlr_x4_direct][axis_micron_nor_ctrlr_x4_direct_link]
 
-[axis_micron_nor_ctrlr_x4_direct_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_direct.png)
+[axis_micron_nor_ctrlr_x4_direct_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_direct.png
 
 
 ## 3. Конечный автомат
@@ -140,7 +140,7 @@ S | out | 1 | сигнал разрешения работы FLASH (CHIP_SELECT)
 
 ![axis_micron_nor_ctrlr_x4_fsm_init][axis_micron_nor_ctrlr_x4_fsm_init_link]
 
-[axis_micron_nor_ctrlr_x4_fsm_init_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_init.png)
+[axis_micron_nor_ctrlr_x4_fsm_init_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_init.png
 
 #### 3.1.1 Состояния конечного автомата процесса инициализации
 
@@ -160,14 +160,14 @@ IDLE_ST | Ничего не делаем | IDLE_ST | Не представлен
 
 ![axis_micron_nor_ctrlr_x4_init][axis_micron_nor_ctrlr_x4_init_link]
 
-[axis_micron_nor_ctrlr_x4_init_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_init.png)
+[axis_micron_nor_ctrlr_x4_init_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_init.png
 
 
 ### 3.2 Операция записи 
 
 ![axis_micron_nor_ctrlr_x4_fsm_program][axis_micron_nor_ctrlr_x4_fsm_program_link]
 
-[axis_micron_nor_ctrlr_x4_fsm_program_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_program.png)
+[axis_micron_nor_ctrlr_x4_fsm_program_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_program.png
 
 #### 3.2.1. Состояния конечного автомата операции записи
 
@@ -193,19 +193,19 @@ FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловны
 
 ![axis_micron_nor_ctrlr_x4_programstart][axis_micron_nor_ctrlr_x4_programstart_link]
 
-[axis_micron_nor_ctrlr_x4_programstart_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_programstart.png)
+[axis_micron_nor_ctrlr_x4_programstart_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_programstart.png
 
 Конец
 
 ![axis_micron_nor_ctrlr_x4_programend][axis_micron_nor_ctrlr_x4_programend_link]
 
-[axis_micron_nor_ctrlr_x4_programend_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_programend.png)
+[axis_micron_nor_ctrlr_x4_programend_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_programend.png
 
 ### 3.3 Операция стирания
 
 ![axis_micron_nor_ctrlr_x4_fsm_erase][axis_micron_nor_ctrlr_x4_fsm_erase_link]
 
-[axis_micron_nor_ctrlr_x4_fsm_erase_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_erase.png)
+[axis_micron_nor_ctrlr_x4_fsm_erase_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_erase.png
 
 #### 3.3.1. Состояния конечного автомата операции стирания 
 
@@ -231,7 +231,7 @@ FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловны
 
 ![axis_micron_nor_ctrlr_x4_fsm_read][axis_micron_nor_ctrlr_x4_fsm_read_link]
 
-[axis_micron_nor_ctrlr_x4_fsm_read_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_read.png)
+[axis_micron_nor_ctrlr_x4_fsm_read_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_read.png
 
 Текущее состояние | Действия | Следующее состояние | Условие перехода
 ------------------|----------|---------------------|-----------------
@@ -250,7 +250,7 @@ FINALIZE_ST | Завершаем команду | IDLE_ST | Безусловны
 
 ![axis_micron_nor_ctrlr_x4_fsm_nocmd][axis_micron_nor_ctrlr_x4_fsm_nocmd_link]
 
-[axis_micron_nor_ctrlr_x4_fsm_nocmd_link]:(https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_nocmd.png)
+[axis_micron_nor_ctrlr_x4_fsm_nocmd_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_nocmd.png
 
 ## 4. Необходимые внешние компоненты 
 
