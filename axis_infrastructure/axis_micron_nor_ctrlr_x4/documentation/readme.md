@@ -19,6 +19,7 @@
 
 
 ![axis_micron_nor_ctrlr_x4_struct][axis_micron_nor_ctrlr_x4_struct_link]
+
 [axis_micron_nor_ctrlr_x4_struct_link]:https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_micron_nor_ctrlr_x4/documentation/axis_micron_nor_ctrlr_x4_fsm_init.png
 
 ## generic-параметры
