@@ -38,7 +38,7 @@ end axis_dump_gen;
 
 architecture axis_dump_gen_arch of axis_dump_gen is
     
-    constant VERSION : string := "v1.0";
+    constant VERSION : string := "v1.8";
     
     ATTRIBUTE X_INTERFACE_INFO : STRING;
     ATTRIBUTE X_INTERFACE_INFO of RESET: SIGNAL is "xilinx.com:signal:reset:1.0 RESET RST";
@@ -113,7 +113,7 @@ architecture axis_dump_gen_arch of axis_dump_gen is
     signal  out_full            :           std_logic                                                               ;
     signal  out_awfull          :           std_logic                                                               ;
 
-    signal  word_cnt            :           std_logic_vector (  15 downto 0 )   := (others => '0')  ;
+    signal  word_cnt            :           std_logic_vector (  31 downto 0 )   := (others => '0')  ;
     signal  cnt_vector          :           std_logic_Vector ( DATA_WIDTH-1 downto 0 ) := (others => '0');
 
     signal  word_limit_reg      :           std_logic_vector ( 31 downto 0 ) := (others => '0')         ;

@@ -91,4 +91,8 @@ where `SPEED` - speed in bit per second
 **9. 29.07.2020 v1.7 - changes on generator ** 
 - corrected word_limit_reg assigning : if work in process, and we change `WORD_LIMIT` value, then new value doesnt apply in previous version
 
+**10. 20.09.2021 v1.8 - changes on generator ** 
+- Fix error for width of word_cnt counter: it is 16 bit when input data width for PACKET_SIZE is 32 bit. This problem caused a next situation: when `PACKET_SIZE` > 65536(included), then generator works on full bandwidth without pauses and only reset signal can transit internal FSM to other states. Solution: word_cnt width changed to 32 bit instead 16 bit.  
+
+
 [logo]: https://github.com/MasterPlayer/xilinx-vhdl/blob/master/axis_infrastructure/axis_dump_gen/documentation/axis_dump_gen.png
